@@ -49,7 +49,6 @@ namespace ExternalProfilerDriver
                 throw new Exception("Only Linux and Windows are supported at this time");
             }
 
-#if false
             string fname = "";
             if (RuntimeEnvironment.OperatingSystemPlatform == Platform.Windows) {
                 fname = Path.Combine("bin32", _vtuneExeBasename + ".exe");
@@ -64,8 +63,6 @@ namespace ExternalProfilerDriver
             } else {
                 throw new Exception($"Could not find {fname}, please check you have installed VTune");
             }
-#endif
-            return "";
         }
 
         private readonly string _path;             // vtune path

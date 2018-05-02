@@ -41,17 +41,6 @@ namespace ExternalProfilerDriver
         public IEnumerable<string> Rest { get; set; }
     }
 
-#if false
-    class Program
-    {
-        static void Main(string[] args)
-        {
-            Console.WriteLine("Hello, world!");
-            Console.ReadKey();
-        }
-    }
-#endif
-
     class Program {
 
         static void Main(string[] args) {
@@ -60,11 +49,6 @@ namespace ExternalProfilerDriver
                 config.EnableDashDash = true;
             });
 
-            Console.WriteLine("Hello world!");
-            Console.ReadKey();
-
-
-#if false
             var res = parser.ParseArguments<ProgramOptions>(args)
                             .WithParsed<ProgramOptions>(opts => {
 
@@ -75,7 +59,6 @@ namespace ExternalProfilerDriver
 #endif
                                     Environment.Exit(0);
                                 }
-#if false
 
                                 string vtuneExec = "";
                                 try {
@@ -124,6 +107,7 @@ namespace ExternalProfilerDriver
                                     Environment.Exit(0);
                                 }
 
+#if false
                                 var stackReportFName = repspec.ReportOutputFile;
                                 if (!File.Exists(stackReportFName)) {
                                     Console.WriteLine("Cannot find the VTune report, something went wrong with the profiler process.");
@@ -136,13 +120,11 @@ namespace ExternalProfilerDriver
                                 Console.WriteLine("Incorrect command line.");
                                 Environment.Exit(1);
                             });
-#endif
 
             Environment.Exit(0);
         }
 
 #if false
-
         private static void ParseStackReport(string fname)
         {
             string possibleFn = fname;
