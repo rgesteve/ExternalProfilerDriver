@@ -37,6 +37,9 @@ namespace ExternalProfilerDriver
         [Option('c', "callstack", HelpText = "Specify the pre-generated callstack report to process")]
         public string CallStackFNameToParse { get; set; }
 
+        [Option('d', "dwjsondir", HelpText = "Specify the directory in which to dump resulting dwjson (contents are overwritten)")]
+        public string DWJsonOutDir { get; set; }
+
         [Value(0)]
         public IEnumerable<string> Rest { get; set; }
     }
@@ -44,6 +47,8 @@ namespace ExternalProfilerDriver
     class Program {
 
         static void Main(string[] args) {
+
+            string dwjsonDir = "";
 
             var parser = new Parser(config => {
                 config.EnableDashDash = true;
@@ -87,8 +92,26 @@ namespace ExternalProfilerDriver
                                 VTuneCPUUtilizationSpec reptimespec = new VTuneCPUUtilizationSpec();
                                 string vtuneReportTimeArgs = reptimespec.FullCLI();
 
+                                // If output directory requested and it does not exist, create it
+
                                 if (!opts.DryRunRequested) {
-#if false
+                                    if (opts.DWJsonOutDir == null) {
+                                        Console.WriteLine($"Need an output directory unless in dry run.");
+                                        Environment.Exit(1);
+                                    } else {
+                                        if (!Directory.Exists(opts.DWJsonOutDir)) {
+                                            try {
+                                                Directory.CreateDirectory(opts.DWJsonOutDir);
+                                            } catch (Exception ex) {
+                                                Console.WriteLine($"Couldn't create specified directory [{opts.DWJsonOutDir}]: {ex.Message}");
+                                                Environment.Exit(1);
+                                            }
+                                        }
+                                        dwjsonDir = opts.DWJsonOutDir;
+                                    }
+                                }
+
+                                if (!opts.DryRunRequested) {
                                     Console.WriteLine($"Collect command line is: [ {vtuneExec} {vtuneCollectArgs} ]");
                                     ProcessAsyncRunner.RunWrapper(vtuneExec, vtuneCollectArgs);
 
@@ -97,7 +120,6 @@ namespace ExternalProfilerDriver
 
                                     Console.WriteLine($"Report timing line: [ {vtuneExec} {vtuneReportTimeArgs} ]");
                                     ProcessAsyncRunner.RunWrapper(vtuneExec, vtuneReportTimeArgs);
-#endif
                                 } else {
                                     Console.WriteLine($"Collect command line is: [ {vtuneExec} {vtuneCollectArgs} ]");
                                     Console.WriteLine("Report command lines");
@@ -106,6 +128,17 @@ namespace ExternalProfilerDriver
 
                                     Environment.Exit(0);
                                 }
+
+                                /*
+                                Console.WriteLine($"Please check for generated file: [{repspec.ReportOutputFile}]");
+                                Console.WriteLine($"\tand also [{reptimespec.ReportOutputFile}]");
+                                Console.WriteLine($"(Which I should process and dump at directory [{dwjsonDir}]");
+                                */
+
+                                double runtime = VTuneToDWJSON.CSReportToDWJson(repspec.ReportOutputFile, Path.Combine(dwjsonDir,"Sample.dwjson"));
+                                VTuneToDWJSON.CPUReportToDWJson(reptimespec.ReportOutputFile, Path.Combine(dwjsonDir, "Session.counters"), runtime);
+
+                                Console.WriteLine($"Which I dumped at directory [{dwjsonDir}]");
 
 #if false
                                 var stackReportFName = repspec.ReportOutputFile;
