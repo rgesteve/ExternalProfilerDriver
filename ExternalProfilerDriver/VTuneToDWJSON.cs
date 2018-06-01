@@ -44,8 +44,7 @@ namespace ExternalProfilerDriver
         public SequenceBaseSize(long start = 0, long size = 10) { _current = start; _size = size; }
         public IEnumerable<BaseSizeTuple> Generate()
         {
-            while (true)
-            {
+            while (true) {
                 yield return new BaseSizeTuple(_current, _size);
                 _current += _size + 1;
             }
@@ -61,8 +60,7 @@ namespace ExternalProfilerDriver
         public static double CSReportToDWJson(string filename, string outfname)
         {
 
-            if (!File.Exists(filename))
-            {
+            if (!File.Exists(filename)) {
                 throw new ArgumentException($"Specified file {filename} does not exist!");
             }
             var samples = ParseFromFile(filename);
@@ -87,22 +85,20 @@ namespace ExternalProfilerDriver
             })
                                        .ToDictionary(od => od.Module, od => od.Functions);
 
-            if (mfdd.Count <= 0)
-            {
+            if (mfdd.Count <= 0) {
                 throw new Exception("Couldn't build the module/function dictionary, can't figure out why");
             }
 
-            var mods = mfdd.Zip(Enumerable.Range(1, int.MaxValue), (x, y) => new ModuleSpec()
-            {
+            var mods = mfdd.Zip(Enumerable.Range(1, int.MaxValue), (x, y) => new ModuleSpec() {
                 name = x.Key,
                 id = y,
                 begin = new LongInt(0, 0), // should build these according to mfdd (i.e., argument x)
                 end = new LongInt(0, 10000), // not sure why 2500 is the smallest number than seems to work
-                baseX = new LongInt(0, (y - 1) * 1000),
+                @base = new LongInt(0, (y - 1) * 1000),
                 size = new LongInt(0, 300),
                 ranges = x.Value.Select(xx => new FunctionSpec(xx.Key, xx.Value.Base, xx.Value.Size)).ToList()
             });
-            var modBase = mods.ToDictionary(x => x.name, x => x.baseX);
+            var modBase = mods.ToDictionary(x => x.name, x => x.@base);
 
             AddressTranslator tr = new AddressTranslator(modBase, mfdd);
 
@@ -111,12 +107,9 @@ namespace ExternalProfilerDriver
 
             List<FrameInfo> chains = new List<FrameInfo>();
             int idx = 0;
-            foreach (var s in samples)
-            {
-                foreach (var y in s.Stacks)
-                {
-                    var fi = new FrameInfo
-                    {
+            foreach (var s in samples) {
+                foreach (var y in s.Stacks) {
+                    var fi = new FrameInfo {
                         timestamp = new LongInt(0, startime + stepsize * idx),
                         frameIPs = y.Select(z => tr.Translate(z.Module, z.Function)).ToList()
                     };
@@ -127,8 +120,7 @@ namespace ExternalProfilerDriver
                 }
             }
 
-            ProcessSpec proc = new ProcessSpec
-            {
+            ProcessSpec proc = new ProcessSpec {
                 name = "python36.dll",
                 id = 1234,
                 begin = new LongInt(0, 1000),
@@ -141,8 +133,7 @@ namespace ExternalProfilerDriver
             List<ProcessSpec> processes = new List<ProcessSpec>(); // TODO -- is there a literal for this?
             processes.Add(proc);
 
-            ThreadSpec thread = new ThreadSpec()
-            {
+            ThreadSpec thread = new ThreadSpec() {
                 id = 1,
                 begin = new LongInt(0, 2000),
                 end = new LongInt(0, 3000),
@@ -153,18 +144,15 @@ namespace ExternalProfilerDriver
             threads.Add(thread);
             proc.threads = threads;
 
-            var trace = new Trace
-            {
-                totalTimeRange = new TimeSpec
-                {
+            var trace = new Trace {
+                totalTimeRange = new TimeSpec {
                     begin = new LongInt(0, 0),
                     //duration = new LongInt(0, (int)(total * 1000))
                     //duration = new LongInt(0, 10000)
                     duration = duration
                 },
                 name = "machine-name",
-                processor = new ProcessorSpec
-                {
+                processor = new ProcessorSpec {
                     logicalCount = 4,
                     speedInMHz = 2670,
                     pointerSizeInBytes = 4,
@@ -195,13 +183,11 @@ namespace ExternalProfilerDriver
         public static void CPUReportToDWJson(string filename, string outfname, double timeTotal = 0.0)
         {
 
-            if (!File.Exists(filename))
-            {
+            if (!File.Exists(filename)) {
                 throw new ArgumentException($"Cannot find specified CPU utilization report {filename}");
             }
 
-            if (timeTotal <= 0)
-            {
+            if (timeTotal <= 0) {
                 throw new Exception("Invalid runtime specification in CPU utilization report");
             }
 
@@ -227,8 +213,7 @@ namespace ExternalProfilerDriver
             List<ValueTrace> vts = new List<ValueTrace>();
             vts.Add(new ValueTrace(Enumerable.Range(0, int.MaxValue).Take(steps).Zip(cpuRecords, (x, y) => new CPUSample(TraceUtils.ToNanoseconds(x * stepSize), (float)(y.CPUUtil)))));
 
-            CPUUtilTrace trace = new CPUUtilTrace
-            {
+            CPUUtilTrace trace = new CPUUtilTrace {
                 beginTime = new LongInt(0, 0),
                 //duration = new LongInt(0, totalTime),
                 duration = durationli,
@@ -239,8 +224,7 @@ namespace ExternalProfilerDriver
 
             // var fs = new FileStream(@"C:\users\perf\Sample2.counters", FileMode.Create);
             var fs = new FileStream(outfname, FileMode.Create);
-            using (StreamWriter writer = new StreamWriter(fs, Encoding.Unicode))
-            { // encoding in Unicode here is key
+            using (StreamWriter writer = new StreamWriter(fs, Encoding.Unicode)) { // encoding in Unicode here is key
                 writer.WriteLine(json);
             }
         }
