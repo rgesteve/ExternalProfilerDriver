@@ -1,4 +1,4 @@
-﻿// Python Tools for Visual Studio
+// Python Tools for Visual Studio
 // Copyright(c) 2018 Intel Corporation.  All rights reserved.
 // Copyright(c) Microsoft Corporation
 // All rights reserved.
@@ -27,6 +27,7 @@ using CommandLine.Text;
 
 namespace ExternalProfilerDriver
 {
+    
     class ProgramOptions {
         [Option('p', "path", HelpText = "Report VTune path")]
         public bool ReportVTunePath { get; set; }
@@ -36,6 +37,9 @@ namespace ExternalProfilerDriver
 
         [Option('c', "callstack", HelpText = "Specify the pre-generated callstack report to process")]
         public string CallStackFNameToParse { get; set; }
+        
+        [Option('s', "sympath", HelpText = "Specify the path(s) to search symbols in")]
+        public string SymbolPath { get; set; }
 
         [Option('d', "dwjsondir", HelpText = "Specify the directory in which to dump resulting dwjson (contents are overwritten)")]
         public string DWJsonOutDir { get; set; }
@@ -47,12 +51,13 @@ namespace ExternalProfilerDriver
     class Program {
 
         static void Main(string[] args) {
-
+            
             string dwjsonDir = "";
 
             var parser = new Parser(config => {
                 config.EnableDashDash = true;
             });
+
 
             var res = parser.ParseArguments<ProgramOptions>(args)
                             .WithParsed<ProgramOptions>(opts => {
@@ -66,6 +71,7 @@ namespace ExternalProfilerDriver
                                 }
 
                                 string vtuneExec = "";
+
                                 try {
                                     vtuneExec = VTuneInvoker.VTunePath();
                                 } catch (VTuneNotInstalledException ex) {
@@ -78,12 +84,21 @@ namespace ExternalProfilerDriver
                                     Console.WriteLine($"The path of VTune is: {vtuneExec}");
                                     Environment.Exit(0);
                                 }
-
+                                
+                                if (opts.SymbolPath != null) {
+                                    Console.WriteLine($"Somehow the thing thinks I have a symbolpath, and it is [{opts.SymbolPath}]");
+                                }
+                                
                                 var RestArgs = opts.Rest.ToList();
                                 VTuneCollectHotspotsSpec spec = new VTuneCollectHotspotsSpec()
                                 {
                                     WorkloadSpec = String.Join(" ", RestArgs)
                                 };
+                                
+                                if (opts.SymbolPath != string.Empty) {
+                                    spec.SymbolPath = opts.SymbolPath;
+                                }
+                                
                                 string vtuneCollectArgs = spec.FullCLI();
 
                                 VTuneReportCallstacksSpec repspec = new VTuneReportCallstacksSpec();
@@ -134,7 +149,7 @@ namespace ExternalProfilerDriver
                                 Console.WriteLine($"\tand also [{reptimespec.ReportOutputFile}]");
                                 Console.WriteLine($"(Which I should process and dump at directory [{dwjsonDir}]");
                                 */
-
+#if false
                                 double runtime = VTuneToDWJSON.CSReportToDWJson(repspec.ReportOutputFile, Path.Combine(dwjsonDir,"Sample.dwjson"));
                                 VTuneToDWJSON.CPUReportToDWJson(reptimespec.ReportOutputFile, Path.Combine(dwjsonDir, "Session.counters"), runtime);
 
@@ -147,7 +162,7 @@ namespace ExternalProfilerDriver
                                     Environment.Exit(1);
                                 }
 #endif
-
+#endif // this is the general one
                             })
                             .WithNotParsed(errors => {
                                 Console.WriteLine("Incorrect command line.");

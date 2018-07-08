@@ -241,6 +241,7 @@ namespace ExternalProfilerDriver
     {
         public abstract string AnalysisName { get; }
         public string WorkloadSpec { get; set; }
+        public string SymbolPath { get; set; }
         public string AnalysisCLI
         {
             get { return "-collect" + " " + AnalysisName; }
@@ -263,6 +264,11 @@ namespace ExternalProfilerDriver
             sb.Append(AnalysisCLI);
             sb.Append(" " + UserDataDirCLI());
             sb.Append(" " + ResultDirCLI);
+            
+            if (this.SymbolPath != String.Empty) {
+                sb.Append($" -search-dir {this.SymbolPath}");
+            }
+            
             sb.Append(WorkloadCLI);
             return sb.ToString();
         }
