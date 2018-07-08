@@ -259,3 +259,7 @@ paket-files/
 # Python Tools for Visual Studio (PTVS)
 __pycache__/
 *.pyc
+
+# Jupyter and Jupyterlab checkpoints
+.ipynb_checkpoints/
+
