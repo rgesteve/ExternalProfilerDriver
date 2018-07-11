@@ -41,6 +41,9 @@ namespace ExternalProfilerDriver
         [Option('s', "sympath", HelpText = "Specify the path(s) to search symbols in")]
         public string SymbolPath { get; set; }
 
+        [Option('k', "console", HelpText = "Drop into console once the profiler data is collected and processed")]
+        public bool ConsoleRequested { get; set; }
+
         [Option('d', "dwjsondir", HelpText = "Specify the directory in which to dump resulting dwjson (contents are overwritten)")]
         public string DWJsonOutDir { get; set; }
 
@@ -63,10 +66,20 @@ namespace ExternalProfilerDriver
                             .WithParsed<ProgramOptions>(opts => {
 
                                 if (opts.CallStackFNameToParse != null) {
-                                    // TODO: test /tmp/results_20180314/r_stacks_0004.csv
-#if false
-                                    ParseStackReport(opts.CallStackFNameToParse);
-#endif
+                                    try {
+                                        // TODO: test /tmp/results_20180314/r_stacks_0004.csv
+                                        ParseStackReport(opts.CallStackFNameToParse);
+                                    } catch (Exception ex) {
+                                        Console.WriteLine($"Couldn't parse callstack file with error: {ex.Message}");
+                                        Environment.Exit(1);
+                                    }
+
+                                    if (opts.ConsoleRequested) {
+                                        Console.WriteLine("Should be opening console");
+                                    } else {
+                                        Console.WriteLine("Should be duping");
+                                    }
+
                                     Environment.Exit(0);
                                 }
 
@@ -172,22 +185,53 @@ namespace ExternalProfilerDriver
             Environment.Exit(0);
         }
 
-#if false
+        public class ParseStackException : Exception
+        {
+            public ParseStackException() {
+                /* empty */
+            }
+
+            public ParseStackException(string message) : base(message)
+            {
+                /* empty */
+            }
+
+            public ParseStackException(string message, Exception inner) : base(message, inner)
+            {
+                /* empty */
+            }
+        }
+
         private static void ParseStackReport(string fname)
         {
+
             string possibleFn = fname;
             if (!File.Exists(possibleFn)) {
                 // The [old] argument parsing library chokes on absolute Linux paths (it gets confused apparently by leading '/')
                 possibleFn = Path.DirectorySeparatorChar + possibleFn;
-                if (!File.Exists(possibleFn))
-                {
-                    Console.WriteLine($"Cannot find {fname}");
-                    return;
+                if (!File.Exists(possibleFn)) {
+                    throw new ParseStackException($"Cannot find callstack file {fname}");
                 }
             }
-
             try {
                 var samples = VTuneToDWJSON.ParseFromFile(possibleFn);
+
+#if true
+                foreach(var s in samples) {
+                    Console.WriteLine($"The top of the stack: {s.TOSFrame.ToString()}");
+                    int branchCount = 0;
+                    foreach (var ss in s.Stacks) {
+                        branchCount++;
+                        Console.WriteLine($"\tbranch: {branchCount}");
+                        foreach (var frame in ss) {
+                            //if (!(frame.FunctionFull.StartsWith('[') || frame.FunctionFull.StartsWith('<'))) {
+                                //Console.WriteLine($"\t\t{frame.ToString()}");
+                                Console.WriteLine($"\t\t({frame.FunctionFull}, {frame.SourceFile})");
+                            //}
+                        }
+                    }
+                }
+#else
                 int sample_counter = 1;
                 foreach (var s in samples.Take(5))
                 {
@@ -205,11 +249,10 @@ namespace ExternalProfilerDriver
                     }
                 }
                 Console.WriteLine($"Got {samples.Count()} samples.");
+#endif
             } catch (Exception ex) {
                 Console.WriteLine($"Caught an error, with message: [{ex.StackTrace}]");
             }
         }
-#endif
-
     }
 }
