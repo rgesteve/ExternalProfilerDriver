@@ -72,6 +72,7 @@ namespace ExternalProfilerDriver
         [JsonProperty("base")]
         public LongInt @base { get; set; }
         public LongInt size { get; set; }
+        public IList<LineSpec> lines { get; set; }
 
         public FunctionSpec(string _name, long _base, long _size)
         {
@@ -91,6 +92,7 @@ namespace ExternalProfilerDriver
         public LongInt @base { get; set; }
         public LongInt size { get; set; }
         public IList<FunctionSpec> ranges { get; set; }
+        public IList<FileIDMapSpec> fileIdMapping { get; set; }
 
         public ModuleSpec()
         {
@@ -108,6 +110,22 @@ namespace ExternalProfilerDriver
             name = _name;
             ranges = _ranges.ToList();
         }
+    }
+
+    class LineSpec
+    {
+      public int fileId      { get; set; }
+      public int offset      { get; set; } 
+      public int lineBegin   {get; set; } 
+      public int lineEnd     {get; set; } 
+      public int columnBegin {get; set; } 
+      public int columnEnd   {get; set; } 
+    }
+
+    class FileIDMapSpec
+    {
+        public int id { get; set; }
+        public string file { get; set; }
     }
 
     class ThreadSpec
