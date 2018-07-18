@@ -204,7 +204,7 @@ namespace ExternalProfilerDriver
 
         private static void ParseStackReport(string fname)
         {
-
+            Console.WriteLine("*** In ParseStackReport");
             string possibleFn = fname;
             if (!File.Exists(possibleFn)) {
                 // The [old] argument parsing library chokes on absolute Linux paths (it gets confused apparently by leading '/')
@@ -225,10 +225,40 @@ namespace ExternalProfilerDriver
 
 #if true
                 foreach(var s in modFunDictionary) {
+#if false
                     Console.WriteLine($"In module: {s.Module}");
-                    foreach (var t in s.Functions) {
-                        Console.WriteLine($"\tFunction: {t.Function}, in source: {t.SourceFile}");                        
+#else
+                    if (s.Module == "libz.so.1") {
+                        #if false
+                        foreach (var t in s.Functions) {
+                            Console.WriteLine($"\tFunction: {t.Function}, in source: {t.SourceFile}");
+                        }
+                        #endif
+
+                        string rootDir = System.Environment.GetEnvironmentVariable("HOME");
+                        string funcFile = Path.Combine(rootDir, "Downloads", "mock-funcsline.csv");
+
+                        try {
+
+                            SymbolReader symreader = SymbolReader.Load(funcFile);
+                            List<FunctionSourceLocation> funclines = symreader.FunctionLocations().ToList();
+                            Console.WriteLine($"*** In ParseStackReport, I have a record for : [{funclines.Count}] function/lines");
+                            var funcFileLine = s.Functions.Join(funclines,
+                                                                 modfun => modfun.Function,
+                                                                 funline => funline.Function,
+                                                                 (modfun, funline) => new { FunctionName = modfun.Function, SourceFile = funline.SourceFile, LineNumber = funline.LineNumber}
+                            );
+                            var filesInMod = funcFileLine.Select(x => x.SourceFile).Distinct();
+                            List<FileIDMapSpec> fileidmap = Enumerable.Range(1, int.MaxValue).Zip(filesInMod, (i, f) => new FileIDMapSpec { id = i, file = f } ).ToList();
+                            foreach (var r in fileidmap) {
+                                Console.WriteLine($"record: {r.id} : {r.file}");
+                            }
+
+                        } catch (Exception ex) {
+                            Console.WriteLine($"Caught an exception while processing functions: [{ex.Message}]");
+                        }
                     }
+#endif
 #if false
                     int branchCount = 0;
                     foreach (var ss in s.Stacks) {
