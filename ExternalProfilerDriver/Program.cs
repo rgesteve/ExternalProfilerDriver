@@ -41,7 +41,7 @@ namespace ExternalProfilerDriver
         [Option('s', "sympath", HelpText = "Specify the path(s) to search symbols in")]
         public string SymbolPath { get; set; }
 
-        [Option('k', "console", HelpText = "Drop into console once the profiler data is collected and processed")]
+        [Option('i', "interactive", HelpText = "Drop into console once the profiler data is collected and processed")]
         public bool ConsoleRequested { get; set; }
 
         [Option('d', "dwjsondir", HelpText = "Specify the directory in which to dump resulting dwjson (contents are overwritten)")]
@@ -77,7 +77,7 @@ namespace ExternalProfilerDriver
                                     if (opts.ConsoleRequested) {
                                         Console.WriteLine("Should be opening console");
                                     } else {
-                                        Console.WriteLine("Should be duping");
+                                        Console.WriteLine("Should be dumping");
                                     }
 
                                     Environment.Exit(0);
@@ -214,11 +214,22 @@ namespace ExternalProfilerDriver
                 }
             }
             try {
+                // should I not just call VTuneToDWJSON.CSReportToDWJson
                 var samples = VTuneToDWJSON.ParseFromFile(possibleFn);
+                
+                var modFunDictionary = samples.SelectMany(sm => sm.AllSamples())
+                                              .Select(p => new { Module = p.Module, Function = p.Function, SourceFile = p.SourceFile })
+                                              .GroupBy(t => t.Module)
+                                              .Select(g => new { Module = g.Key, Functions = g.Select(gg => new { Function = gg.Function, SourceFile = gg.SourceFile}).Distinct(),  })
+                                    ;
 
 #if true
-                foreach(var s in samples) {
-                    Console.WriteLine($"The top of the stack: {s.TOSFrame.ToString()}");
+                foreach(var s in modFunDictionary) {
+                    Console.WriteLine($"In module: {s.Module}");
+                    foreach (var t in s.Functions) {
+                        Console.WriteLine($"\tFunction: {t.Function}, in source: {t.SourceFile}");                        
+                    }
+#if false
                     int branchCount = 0;
                     foreach (var ss in s.Stacks) {
                         branchCount++;
@@ -230,6 +241,7 @@ namespace ExternalProfilerDriver
                             //}
                         }
                     }
+#endif
                 }
 #else
                 int sample_counter = 1;

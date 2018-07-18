@@ -1,4 +1,4 @@
-﻿// Python Tools for Visual Studio
+// Python Tools for Visual Studio
 // Copyright(c) 2018 Intel Corporation.  All rights reserved.
 // Copyright(c) Microsoft Corporation
 // All rights reserved.
@@ -50,6 +50,7 @@ namespace ExternalProfilerDriver
             }
         }
     }
+
 
     class VTuneToDWJSON
     {
@@ -172,17 +173,22 @@ namespace ExternalProfilerDriver
 
         public static IEnumerable<SampleWithTrace> ParseFromFile(string filename)
         {
+
             var samples = VTuneStackParser.ReadFromFile(filename)
                                           .Skip(1)
+#if true
+                                          //.Take(10)
+#endif
                                           .Select(s => String.Join(",", s.Split(',')
                                           .Select(VTuneStackParser.RemovePrePosComma)))
                                           .ParseFromStream();
+
             return samples;
         }
 
+
         public static void CPUReportToDWJson(string filename, string outfname, double timeTotal = 0.0)
         {
-
             if (!File.Exists(filename)) {
                 throw new ArgumentException($"Cannot find specified CPU utilization report {filename}");
             }
@@ -206,6 +212,7 @@ namespace ExternalProfilerDriver
             trace.counters = new List<ValueTrace> { new ValueTrace(cpuRecords.Select(r => new CPUSample(new LongInt(0, (long)r.Start), (float)r.CPUUtil)).ToList()) };
             */
 
+#if false
             int steps = cpuRecords.Count() - 1;
             double totalTime = timeTotal;
             double stepSize = totalTime / steps;
@@ -227,6 +234,7 @@ namespace ExternalProfilerDriver
             using (StreamWriter writer = new StreamWriter(fs, Encoding.Unicode)) { // encoding in Unicode here is key
                 writer.WriteLine(json);
             }
+#endif
         }
     }
 
@@ -247,3 +255,4 @@ namespace ExternalProfilerDriver
         }
     }
 }
+

@@ -1,4 +1,4 @@
-﻿// Python Tools for Visual Studio
+// Python Tools for Visual Studio
 // Copyright(c) 2018 Intel Corporation.  All rights reserved.
 // Copyright(c) Microsoft Corporation
 // All rights reserved.
@@ -42,12 +42,19 @@ namespace ExternalProfilerDriver
             SourceFile = sourceFile;
             StartAddress = startAddress;
         }
+
+        public override string ToString()
+        {
+            return $"Sample: [ Function: {this.Function}; Module: {this.Module}; FunctionFull: {this.FunctionFull}; SourceFile: {this.SourceFile}; StartAddress: {this.StartAddress}]";
+        }
     }
+
 
     public class SampleWithTrace
     {
         private List<List<PerformanceSample>> _stacks = new List<List<PerformanceSample>>();
         public PerformanceSample TOSFrame { get; }
+
         public IEnumerable<IEnumerable<PerformanceSample>> Stacks
         {
             get
@@ -68,6 +75,7 @@ namespace ExternalProfilerDriver
         {
             _stacks.Add(stack);
         }
+
         public IEnumerable<PerformanceSample> AllSamples()
         {
             yield return TOSFrame; // assumes this is not null
@@ -79,6 +87,12 @@ namespace ExternalProfilerDriver
                 }
             }
         }
+
+        public override string ToString()
+        {
+            return $"TOSStack: {this.TOSFrame.ToString()}, with {this._stacks.Count} stacks.";
+        }
+
     }
 
     static class VTuneStackParser
@@ -119,24 +133,25 @@ namespace ExternalProfilerDriver
             foreach (var l in seq)
             {
                 Match m = startsWithComma.Match(l);
-                if (!m.Success)
+
+                if (!m.Success) // top of the stack (associated with time?)
                 {
-                    if (atEnd == true)
-                    {
-                        if (currentStack != null)
-                        {
+                    if (atEnd == true) {
+                        if (currentStack != null) {
                             current.AddStack(currentStack);
                             currentStack = null;
                         }
                         yield return current;
                     }
+
                     atEnd = false;
 
                     // should assert record is comma-separated, seven-field, second one empty
                     var fields = l.Split(',');
+
                     try
                     {
-                        /* Function, CPUTime, Module, FunctionFull, SourceFile, StartAddress */
+                                                                         /* Function, CPUTime, Module, FunctionFull, SourceFile, StartAddress */
                         current = new SampleWithTrace(new PerformanceSample(fields[0], fields[2], fields[3], fields[4], fields[5], fields[6]));
                     }
                     catch (Exception ex)
@@ -163,7 +178,7 @@ namespace ExternalProfilerDriver
                         try
                         {
                             /* Function, CPUTime, Module, FunctionFull, SourceFile, StartAddress */
-                            currentStack.Add(new PerformanceSample(fields[0], fields[1], fields[2], fields[3], fields[5], fields[5]));
+                            currentStack.Add(new PerformanceSample(fields[0], fields[1], fields[2], fields[3], fields[4], fields[5]));
                         }
                         catch (Exception ex)
                         {
@@ -188,6 +203,6 @@ namespace ExternalProfilerDriver
                 yield return current;
             }
         }
-
     }
 }
+
