@@ -25,6 +25,8 @@ using System.Threading.Tasks;
 using CommandLine;
 using CommandLine.Text;
 
+using Newtonsoft.Json;
+
 namespace ExternalProfilerDriver
 {
     
@@ -225,40 +227,66 @@ namespace ExternalProfilerDriver
 
 #if true
                 foreach(var s in modFunDictionary) {
-#if false
-                    Console.WriteLine($"In module: {s.Module}");
-#else
-                    if (s.Module == "libz.so.1") {
-                        #if false
-                        foreach (var t in s.Functions) {
-                            Console.WriteLine($"\tFunction: {t.Function}, in source: {t.SourceFile}");
-                        }
-                        #endif
+                    string fnamet = s.Module;
+                    if (fnamet != "libz.so.1") {
+                        continue;
+                    } else {
+                       string rootDir = System.Environment.GetEnvironmentVariable("HOME");
+                       string funcFile = Path.Combine(rootDir, "Downloads", "mock-funcsline.csv");
+                       fnamet = funcFile;
+                    }
 
-                        string rootDir = System.Environment.GetEnvironmentVariable("HOME");
-                        string funcFile = Path.Combine(rootDir, "Downloads", "mock-funcsline.csv");
-
-                        try {
-
-                            SymbolReader symreader = SymbolReader.Load(funcFile);
-                            List<FunctionSourceLocation> funclines = symreader.FunctionLocations().ToList();
-                            Console.WriteLine($"*** In ParseStackReport, I have a record for : [{funclines.Count}] function/lines");
-                            var funcFileLine = s.Functions.Join(funclines,
+                    try {
+                        SymbolReader symreader = SymbolReader.Load(fnamet);
+                        var funcFileLine = s.Functions.Join(symreader.FunctionLocations(),
                                                                  modfun => modfun.Function,
                                                                  funline => funline.Function,
                                                                  (modfun, funline) => new { FunctionName = modfun.Function, SourceFile = funline.SourceFile, LineNumber = funline.LineNumber}
-                            );
-                            var filesInMod = funcFileLine.Select(x => x.SourceFile).Distinct();
-                            List<FileIDMapSpec> fileidmap = Enumerable.Range(1, int.MaxValue).Zip(filesInMod, (i, f) => new FileIDMapSpec { id = i, file = f } ).ToList();
-                            foreach (var r in fileidmap) {
-                                Console.WriteLine($"record: {r.id} : {r.file}");
-                            }
-
-                        } catch (Exception ex) {
-                            Console.WriteLine($"Caught an exception while processing functions: [{ex.Message}]");
+                        );
+                        var filesInMod = funcFileLine.Select(x => x.SourceFile).Distinct();
+                        Dictionary<string, int> fileIdDict = new Dictionary<string, int>();
+                        List<FileIDMapSpec> fileidmap = Enumerable.Range(1, int.MaxValue).Zip(filesInMod, (i, f) => new FileIDMapSpec { id = i, file = f } ).ToList();
+                        foreach (var r in fileidmap) {
+                            fileIdDict[r.file] = r.id;
                         }
-                    }
+
+#if false
+                            // Create a two-level dictionary module -> (function -> (base, size))
+                        var mfdd = modFunDictionary.Select(x => new {
+                Module = x.Module,
+                Functions = x.Functions.Zip((new SequenceBaseSize()).Generate(), (f, b) => new { Function = f, BaseSize = b })
+                                                                                 .ToDictionary(t => t.Function, t => t.BaseSize)
+            })
+                                       .ToDictionary(od => od.Module, od => od.Functions);
+
+            if (mfdd.Count <= 0) {
+                throw new Exception("Couldn't build the module/function dictionary, can't figure out why");
+            }
 #endif
+                                
+                        ModuleSpec modtest = new ModuleSpec() {
+                           name = s.Module,
+                           begin = new LongInt(0, 0), 
+                           end = new LongInt(0, 10000),
+                           @base = new LongInt(0, 1000),
+                           size = new LongInt(0, 300),
+                           // ranges = x.Value.Select(xx => new FunctionSpec(xx.Key, xx.Value.Base, xx.Value.Size)).ToList()
+                           ranges = funcFileLine.Select((ffl) => 
+                                                        new FunctionSpec(ffl.FunctionName, 0, 0) { 
+                                                            lines = new List<LineSpec>(Emit<LineSpec>(new LineSpec { 
+                                                                fileId = fileIdDict[ffl.SourceFile], 
+                                                                lineBegin = Convert.ToInt32(ffl.LineNumber) }))}
+                                                       ).ToList(),
+                           fileIdMapping = fileIdDict.Select((kvp, idx) => new FileIDMapSpec { id = kvp.Value, file = kvp.Key}).ToList()
+                        };
+
+                            // modules = mods.ToList()
+                        string json = JsonConvert.SerializeObject(modtest, Formatting.Indented);
+                        Console.WriteLine($"The generated JSON would look like {json}");
+
+                    } catch (Exception ex) {
+                        Console.WriteLine($"Caught an exception while processing functions: [{ex.Message}]");
+                    }
 #if false
                     int branchCount = 0;
                     foreach (var ss in s.Stacks) {
@@ -295,6 +323,11 @@ namespace ExternalProfilerDriver
             } catch (Exception ex) {
                 Console.WriteLine($"Caught an error, with message: [{ex.StackTrace}]");
             }
+        }
+        
+        public static IEnumerable<T> Emit<T>(T element)
+        {
+          return Enumerable.Repeat(element, 1);
         }
     }
 }

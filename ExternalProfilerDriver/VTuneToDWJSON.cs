@@ -90,6 +90,7 @@ namespace ExternalProfilerDriver
                 throw new Exception("Couldn't build the module/function dictionary, can't figure out why");
             }
 
+            // Translate to dwjson data model
             var mods = mfdd.Zip(Enumerable.Range(1, int.MaxValue), (x, y) => new ModuleSpec() {
                 name = x.Key,
                 id = y,
@@ -122,7 +123,7 @@ namespace ExternalProfilerDriver
             }
 
             ProcessSpec proc = new ProcessSpec {
-                name = "python36.dll",
+                name = "python36.dll",           // TODO -- fix this hard-coded value
                 id = 1234,
                 begin = new LongInt(0, 1000),
                 //end = new LongInt(0,8000),
