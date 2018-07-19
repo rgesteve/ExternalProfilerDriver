@@ -325,6 +325,7 @@ namespace ExternalProfilerDriver
             }
         }
         
+        // from an idea in https://github.com/dotnet/corefx/issues/3093
         public static IEnumerable<T> Emit<T>(T element)
         {
           return Enumerable.Repeat(element, 1);
