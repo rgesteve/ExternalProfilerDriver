@@ -206,7 +206,6 @@ namespace ExternalProfilerDriver
 
         private static void ParseStackReport(string fname)
         {
-            Console.WriteLine("*** In ParseStackReport");
             string possibleFn = fname;
             if (!File.Exists(possibleFn)) {
                 // The [old] argument parsing library chokes on absolute Linux paths (it gets confused apparently by leading '/')
@@ -222,10 +221,22 @@ namespace ExternalProfilerDriver
                 var modFunDictionary = samples.SelectMany(sm => sm.AllSamples())
                                               .Select(p => new { Module = p.Module, Function = p.Function, SourceFile = p.SourceFile })
                                               .GroupBy(t => t.Module)
-                                              .Select(g => new { Module = g.Key, Functions = g.Select(gg => new { Function = gg.Function, SourceFile = gg.SourceFile}).Distinct(),  })
-                                    ;
+                                              .Select(g => new { Module = g.Key, 
+                                                                 Functions = g.Select(gg => new { Function = gg.Function, SourceFile = gg.SourceFile}).Distinct(),  
+                                                               })
+                                              ;
 
 #if true
+                foreach(var s in modFunDictionary) {
+                    var funcsInModule = s.Functions.Select(r => r.Function).ToList();
+                    Console.WriteLine($"{s.Module}:");
+                    foreach(var f in funcsInModule) {
+                        Console.WriteLine($"\t{f}");
+                    }
+                }
+#endif
+
+#if false
                 foreach(var s in modFunDictionary) {
                     string fnamet = s.Module;
                     if (fnamet != "libz.so.1") {
@@ -251,17 +262,17 @@ namespace ExternalProfilerDriver
                         }
 
 #if false
-                            // Create a two-level dictionary module -> (function -> (base, size))
-                        var mfdd = modFunDictionary.Select(x => new {
-                Module = x.Module,
-                Functions = x.Functions.Zip((new SequenceBaseSize()).Generate(), (f, b) => new { Function = f, BaseSize = b })
-                                                                                 .ToDictionary(t => t.Function, t => t.BaseSize)
-            })
-                                       .ToDictionary(od => od.Module, od => od.Functions);
+                        // Two-level dictionary module -> (function -> (base, size))
+                        var mfdd = modFunDictionary.Select(x => new { Module = x.Module,
+                                                                      Functions = x.Functions.Zip((new SequenceBaseSize()).Generate(), 
+                                                                                                  (f, b) => new { Function = f, BaseSize = b }
+                                                                                                 ).ToDictionary(t => t.Function, t => t.BaseSize)
+                                                                    }
+                                                          ).ToDictionary(od => od.Module, od => od.Functions);
 
-            if (mfdd.Count <= 0) {
-                throw new Exception("Couldn't build the module/function dictionary, can't figure out why");
-            }
+                        if (mfdd.Count <= 0) {
+                            throw new Exception("Couldn't build the module/function dictionary, can't figure out why");
+                        }
 #endif
                                 
                         ModuleSpec modtest = new ModuleSpec() {
@@ -281,7 +292,7 @@ namespace ExternalProfilerDriver
                         };
 
                             // modules = mods.ToList()
-                        string json = JsonConvert.SerializeObject(modtest, Formatting.Indented);
+                        string json = JsonConvert.SerializeObject(modtest/*, Formatting.Indented*/);
                         Console.WriteLine($"The generated JSON would look like {json}");
 
                     } catch (Exception ex) {
@@ -301,7 +312,7 @@ namespace ExternalProfilerDriver
                     }
 #endif
                 }
-#else
+#if false
                 int sample_counter = 1;
                 foreach (var s in samples.Take(5))
                 {
@@ -319,6 +330,7 @@ namespace ExternalProfilerDriver
                     }
                 }
                 Console.WriteLine($"Got {samples.Count()} samples.");
+#endif
 #endif
             } catch (Exception ex) {
                 Console.WriteLine($"Caught an error, with message: [{ex.StackTrace}]");
