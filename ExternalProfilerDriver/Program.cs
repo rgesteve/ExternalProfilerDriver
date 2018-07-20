@@ -70,7 +70,7 @@ namespace ExternalProfilerDriver
                                 if (opts.CallStackFNameToParse != null) {
                                     try {
                                         // TODO: test /tmp/results_20180314/r_stacks_0004.csv
-                                        ParseStackReport(opts.CallStackFNameToParse);
+                                        ParseStackReport(opts.CallStackFNameToParse, opts.SymbolPath);
                                     } catch (Exception ex) {
                                         Console.WriteLine($"Couldn't parse callstack file with error: {ex.Message}");
                                         Environment.Exit(1);
@@ -204,7 +204,7 @@ namespace ExternalProfilerDriver
             }
         }
 
-        private static void ParseStackReport(string fname)
+        private static void ParseStackReport(string fname, string symbolPath = null)
         {
             string possibleFn = fname;
             if (!File.Exists(possibleFn)) {
@@ -226,7 +226,27 @@ namespace ExternalProfilerDriver
                                                                })
                                               ;
 
-#if true
+                // Two-level dictionary module -> (function -> (base, size))
+                var mfdd = modFunDictionary.Select(x => new { Module = x.Module,
+                                                              Functions = x.Functions.Zip((new SequenceBaseSize()).Generate(), 
+                                                                                           (f, b) => new { Function = f, BaseSize = b }
+                                                                                         ).ToDictionary(t => t.Function, t => new { BaseSize = t.BaseSize, DefinedIn = 1})
+                                                            }
+                                                          ).ToDictionary(od => od.Module, od => od.Functions);
+
+                if (mfdd.Count <= 0) {
+                    throw new Exception("Couldn't build the module/function dictionary, can't figure out why");
+                }
+
+                foreach (var m in mfdd) {
+                    Console.WriteLine($"Got a module: {m.Key}");
+                    if (symbolPath != null && Directory.Exists(symbolPath)) {
+                        Console.WriteLine("Checking purported symbol path");
+                        var candidates = Directory.EnumerateFiles(symbolPath, m.Key + ".pdb", SearchOption.AllDirectories).ToList();
+                        Console.WriteLine($"The candidate list has {candidates.Count} elements.");
+                    }
+                }
+#if false
                 foreach(var s in modFunDictionary) {
                     var funcsInModule = s.Functions.Select(r => r.Function).ToList();
                     Console.WriteLine($"{s.Module}:");
@@ -237,6 +257,7 @@ namespace ExternalProfilerDriver
 #endif
 
 #if false
+                // second pass for source line mapping
                 foreach(var s in modFunDictionary) {
                     string fnamet = s.Module;
                     if (fnamet != "libz.so.1") {
@@ -260,20 +281,6 @@ namespace ExternalProfilerDriver
                         foreach (var r in fileidmap) {
                             fileIdDict[r.file] = r.id;
                         }
-
-#if false
-                        // Two-level dictionary module -> (function -> (base, size))
-                        var mfdd = modFunDictionary.Select(x => new { Module = x.Module,
-                                                                      Functions = x.Functions.Zip((new SequenceBaseSize()).Generate(), 
-                                                                                                  (f, b) => new { Function = f, BaseSize = b }
-                                                                                                 ).ToDictionary(t => t.Function, t => t.BaseSize)
-                                                                    }
-                                                          ).ToDictionary(od => od.Module, od => od.Functions);
-
-                        if (mfdd.Count <= 0) {
-                            throw new Exception("Couldn't build the module/function dictionary, can't figure out why");
-                        }
-#endif
                                 
                         ModuleSpec modtest = new ModuleSpec() {
                            name = s.Module,
