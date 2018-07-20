@@ -25,6 +25,25 @@ using Microsoft.DotNet.PlatformAbstractions;
 
 namespace ExternalProfilerDriver
 {
+    public struct Maybe<T>
+    {
+        public readonly static Maybe<T> None = new Maybe<T>();
+        public T Value;
+        public bool HasValue;
+
+        public Maybe(T value) {
+            Value = value;
+            HasValue = true;
+        }
+
+        public override string ToString()
+        {
+            if (!HasValue) {
+                return "<None>";
+            }
+            return Value.ToString();
+        }
+    }
 
     public class VTuneInvoker
     {
