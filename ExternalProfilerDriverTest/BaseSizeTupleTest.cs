@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ExternalProfilerDriver;
@@ -23,6 +24,23 @@ namespace ExternalProfilerDriverTest
         {
             var sbs = new SequenceBaseSize();
             CollectionAssert.AllItemsAreNotNull(sbs.Generate().Take(5).ToList());
+        }
+
+        [TestMethod]
+        [DeploymentItem("zlib_example.csv")]
+        public void CSVSourceConstructorTestWith932EncodedText()
+        {
+            string filename = "zlib_example.csv";
+            Assert.IsTrue(File.Exists(filename));
+#if false
+            using (var target = new CSVSource<Sample>(filename))
+            {
+                Assert.IsNotNull(target.ReadNext());
+                Assert.IsNotNull(target.ReadNext());
+                Assert.IsNull(target.ReadNext());
+                target.Close();
+            }
+#endif
         }
     }
 }

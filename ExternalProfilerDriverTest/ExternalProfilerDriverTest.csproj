@@ -16,4 +16,10 @@
     <ProjectReference Include="..\ExternalProfilerDriver\ExternalProfilerDriverNetStandard.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="zlib_example.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
