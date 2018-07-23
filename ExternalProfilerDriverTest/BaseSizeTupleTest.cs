@@ -28,7 +28,7 @@ namespace ExternalProfilerDriverTest
 
         [TestMethod]
         [DeploymentItem("zlib_example.csv")]
-        public void CSVSourceConstructorTestWith932EncodedText()
+        public void TestDeploymentItem()
         {
             string filename = "zlib_example.csv";
             Assert.IsTrue(File.Exists(filename));
@@ -41,6 +41,14 @@ namespace ExternalProfilerDriverTest
                 target.Close();
             }
 #endif
+        }
+
+        [TestMethod]
+        [DeploymentItem("mock-funcsline.csv")]
+        public void VerifyFuncLines()
+        {
+            string filename = "mock-funcsline.csv";
+            Assert.IsTrue(File.Exists(filename));
         }
     }
 }
