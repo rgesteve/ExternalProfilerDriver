@@ -291,7 +291,7 @@ namespace ExternalProfilerDriver
                            // ranges = x.Value.Select(xx => new FunctionSpec(xx.Key, xx.Value.Base, xx.Value.Size)).ToList()
                            ranges = funcFileLine.Select((ffl) => 
                                                         new FunctionSpec(ffl.FunctionName, 0, 0) { 
-                                                            lines = new List<LineSpec>(Emit<LineSpec>(new LineSpec { 
+                                                            lines = new List<LineSpec>(Utils.Emit<LineSpec>(new LineSpec { 
                                                                 fileId = fileIdDict[ffl.SourceFile], 
                                                                 lineBegin = Convert.ToInt32(ffl.LineNumber) }))}
                                                        ).ToList(),
@@ -342,12 +342,6 @@ namespace ExternalProfilerDriver
             } catch (Exception ex) {
                 Console.WriteLine($"Caught an error, with message: [{ex.StackTrace}]");
             }
-        }
-        
-        // from an idea in https://github.com/dotnet/corefx/issues/3093
-        public static IEnumerable<T> Emit<T>(T element)
-        {
-          return Enumerable.Repeat(element, 1);
         }
     }
 }
