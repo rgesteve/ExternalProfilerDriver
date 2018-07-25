@@ -52,7 +52,7 @@ namespace ExternalProfilerDriver
     }
 
 
-    class VTuneToDWJSON
+    public class VTuneToDWJSON
     {
         /// <summary>
         /// <paramref name="filename"/>
