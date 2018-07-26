@@ -35,6 +35,11 @@ namespace ExternalProfilerDriver
             Base = _base;
             Size = _size;
         }
+        
+        override public string ToString()
+        {
+            return $"({this.Base},{this.Size})";
+        }
     }
 
     public class SequenceBaseSize
@@ -51,6 +56,34 @@ namespace ExternalProfilerDriver
         }
     }
 
+    public class FuncInfo
+    {
+        public string FunctionName { get; set; }
+        public string SourceFile { get; set; }
+        public long? Base { get; set; }
+        public long? Size { get; set; }
+
+        public FuncInfo(string _functionname, string _sourceFile = "")
+        {
+            FunctionName = _functionname;
+            SourceFile = _sourceFile;
+            Base = null;
+            Size = null;
+        }
+    }
+    
+    public class FuncInfoComparer : IEqualityComparer<FuncInfo>
+    {
+        public bool Equals(FuncInfo x, FuncInfo y)
+        {
+            return x.FunctionName == y.FunctionName && x.SourceFile == y.SourceFile;
+        }
+ 
+        public int GetHashCode(FuncInfo obj)
+        {
+            return (obj.FunctionName + obj.SourceFile).GetHashCode();
+        }
+    }
 
     public class VTuneToDWJSON
     {
@@ -172,13 +205,15 @@ namespace ExternalProfilerDriver
             return total;
         }
 
+        /// <summary>
+        /// </summary>
         public static IEnumerable<SampleWithTrace> ParseFromFile(string filename)
         {
 
             var samples = VTuneStackParser.ReadFromFile(filename)
                                           .Skip(1)
-#if true
-                                          //.Take(10)
+#if false
+                                          .Take(10)
 #endif
                                           .Select(s => String.Join(",", s.Split(',')
                                           .Select(VTuneStackParser.RemovePrePosComma)))
@@ -187,6 +222,28 @@ namespace ExternalProfilerDriver
             return samples;
         }
 
+        /// <summary>
+        /// Creates a two-level dictionary from a stream of <cref>SampleWithTrace</cref>.
+        /// The "primary" (top-level) key is the module name, and the lower-level key
+        /// is the function name (function -> (sourcefile, base, size))
+        /// </summary>
+        public static Dictionary< string, Dictionary< string, FuncInfo > > ModuleFuncDictFromSamples(IEnumerable<SampleWithTrace> samples)
+        {
+            var modFunDictionary = samples.SelectMany(sm => sm.AllSamples())
+                                              .Select(p => new { Module = p.Module, Function = p.Function, SourceFile = p.SourceFile })
+                                              .GroupBy(t => t.Module)
+                                              .Select(g => new { Module = g.Key, 
+                                                                 Functions = g.Select(gg => new FuncInfo(gg.Function, gg.SourceFile)).Distinct(new FuncInfoComparer()),
+                                                               });
+
+            var mfdd = modFunDictionary.ToDictionary(r => r.Module, 
+                                                     r => r.Functions.ToDictionary(
+                                                         rr => rr.FunctionName,
+                                                         rr => rr
+                                                     ));
+
+            return mfdd;
+        }
 
         public static void CPUReportToDWJson(string filename, string outfname, double timeTotal = 0.0)
         {

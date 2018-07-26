@@ -24,5 +24,12 @@ namespace ExternalProfilerDriverTest
             var sbs = new SequenceBaseSize();
             CollectionAssert.AllItemsAreNotNull(sbs.Generate().Take(5).ToList());
         }
+        
+        [TestMethod]
+        public void TestGeneratedSample()
+        {
+            var sbs = (new SequenceBaseSize()).Generate().Take(10).ToList();
+            Assert.IsTrue(sbs[4].Base == 44 && sbs[4].Size == 10);
+        }
     }
 }
