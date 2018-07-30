@@ -62,13 +62,13 @@ namespace ExternalProfilerDriver
         public string SourceFile { get; set; }
         public long? Base { get; set; }
         public long? Size { get; set; }
-
-        public FuncInfo(string _functionname, string _sourceFile = "")
+        
+        public FuncInfo(string _functionname, string _sourceFile = "", long? _base = null, long? _size = null)
         {
             FunctionName = _functionname;
             SourceFile = _sourceFile;
-            Base = null;
-            Size = null;
+            Base = _base;
+            Size = _size;
         }
     }
     
