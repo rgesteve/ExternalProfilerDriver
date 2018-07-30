@@ -30,7 +30,11 @@ namespace ExternalProfilerDriver
         }
     }
 
-    public struct Option<T>
+    /// <summary>
+    /// A `Maybe` monad implementation based largely on the one(s) in the
+    /// Azure IoT Edge project.
+    /// </summary>
+    public struct Option<T> : IEquatable< Option<T> >
     {
         public bool HasValue { get; }
                T    Value    { get; }
@@ -44,6 +48,16 @@ namespace ExternalProfilerDriver
         {
             this.Value = _value;
             this.HasValue = _hasValue;
+        }
+        
+        public bool Equals(Option<T> other)
+        {
+            // there is only one `none`:
+            if (!this.HasValue && !other.HasValue) { return true; }
+            if (this.HasValue && other.HasValue) {
+                return EqualityComparer<T>.Default.Equals( this.Value, other.Value);
+            }
+            return false;
         }
 
         public T GetOrElse(T otherwise)
@@ -60,6 +74,9 @@ namespace ExternalProfilerDriver
         }
     }
 
+    /// <summary>
+    /// The `Option<T>` "components" -- in lieu of real Algebraic data types
+    /// </summary>
     public static class Option
     {
         public static Option<T> Some<T>(T value) { return new Option<T>(value, true); }
