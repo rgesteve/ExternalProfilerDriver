@@ -253,8 +253,19 @@ namespace ExternalProfilerDriver
         /// </summary>
         public static Dictionary< string, Dictionary< string, FuncInfo > > AddLineNumbers(Dictionary< string, Dictionary< string, FuncInfo > > orig, string symbolPath)
         {
+
             if (!Directory.Exists(symbolPath)) {
-                return orig;
+                throw new ArgumentException($"Cannot find specified directory: {symbolPath}");
+            }
+
+            foreach (var k in orig.Keys) {
+                try {
+                    string fnd = Utils.FindFileInDir(k, symbolPath);
+                    System.Diagnostics.Trace.WriteLine($"#### (in library) found file: [{fnd}]");
+                } catch (FileNotFoundException ex) {
+                    System.Diagnostics.Trace.WriteLine($"#### (in library) didn't find file {k} for: [{ex.Message}]");
+                    continue;
+                }
             }
             return orig;
         }
