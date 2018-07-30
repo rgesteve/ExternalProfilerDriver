@@ -244,6 +244,20 @@ namespace ExternalProfilerDriver
 
             return mfdd;
         }
+        
+        /// <summary>
+        /// Given a two-level module/function dictionary, check in <para>symbolPath</param> if
+        /// there is information on the source file/line number the function is defined in.
+        ///
+        /// TODO: maybe this function should take a list of possible directories to search?
+        /// </summary>
+        public static Dictionary< string, Dictionary< string, FuncInfo > > AddLineNumbers(Dictionary< string, Dictionary< string, FuncInfo > > orig, string symbolPath)
+        {
+            if (!Directory.Exists(symbolPath)) {
+                return orig;
+            }
+            return orig;
+        }
 
         public static void CPUReportToDWJson(string filename, string outfname, double timeTotal = 0.0)
         {
