@@ -64,6 +64,19 @@ namespace ExternalProfilerDriver
         {
             return (this.HasValue? this.Value : otherwise);
         }
+        
+        // a specialization of the above
+        public T GetOrDefault()
+        {
+            return (this.HasValue? this.Value : default(T));
+        }
+        
+        // The main interface
+        public TResult Match<TResult>(Func<T, TResult> some,
+                                     Func<TResult> none)
+        {
+            return (this.HasValue? some(this.Value) : none() );
+        }
 
         public override string ToString()
         {

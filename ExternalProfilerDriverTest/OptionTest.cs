@@ -28,5 +28,13 @@ namespace ExternalProfilerDriverTest
             Assert.IsTrue(x.HasValue);
             Assert.AreEqual(expected_value, x.GetOrElse(0));
         }
+        
+        [TestMethod]
+        public void TestMatch()
+        {
+            const int expected_value = 42;
+            Option<int> opt = Option.Some(expected_value);
+            Assert.AreEqual(expected_value, opt.Match<int>(some : x => x, none: () => 0));
+        }
     }
 }
