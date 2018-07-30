@@ -29,4 +29,40 @@ namespace ExternalProfilerDriver
           return Enumerable.Repeat(element, 1);
         }
     }
+
+    public struct Option<T>
+    {
+        public bool HasValue { get; }
+               T    Value    { get; }
+        
+        /// <summary>
+        /// This may seem a bit weird for an `Option` constructor, the
+        /// implementation only recognizes the `Value` as valid if `HasValue` has
+        /// been set to `true`.
+        /// </summary>        
+        internal Option(T _value, bool _hasValue)
+        {
+            this.Value = _value;
+            this.HasValue = _hasValue;
+        }
+
+        public T GetOrElse(T otherwise)
+        {
+            return (this.HasValue? this.Value : otherwise);
+        }
+
+        public override string ToString()
+        {
+            if (!HasValue) {
+                return "This Option is None";
+            }
+            return $"Optional has value: {Value}";
+        }
+    }
+
+    public static class Option
+    {
+        public static Option<T> Some<T>(T value) { return new Option<T>(value, true); }
+        public static Option<T> None<T>() { return new Option<T>(default(T), false); }
+    }
 }
