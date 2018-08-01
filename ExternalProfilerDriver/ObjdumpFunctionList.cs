@@ -33,7 +33,7 @@ namespace ExternalProfilerDriver {
                 var loader = new SymbolReaderLinux();
                 loader._sourceFile = pdbpath;
                 return loader;
-            } catch (Exception ex) {
+            } catch (Exception) {
                 throw;
             }
         }

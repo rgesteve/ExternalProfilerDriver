@@ -39,7 +39,7 @@ namespace ExternalProfilerDriver {
                 loader._sourceFile = pdbpath;
 #endif
                 return loader;
-            } catch (Exception ex) {
+            } catch (Exception) {
                 throw;
             }
         }

@@ -261,11 +261,14 @@ namespace ExternalProfilerDriver
             foreach (var k in orig.Keys) {
                 try {
                     string fnd = Utils.FindFileInDir(k, symbolPath);
-                    SymbolReaderLinux reader = SymbolReaderLinux.Load(fnd);
-                    var syms = reader.FunctionLocations().ToList();
-                    System.Diagnostics.Trace.WriteLine($"#### (in library) for file: [{fnd}] I found [{syms.Count}] symbols");
-                } catch (FileNotFoundException ex) {
-                    // System.Diagnostics.Trace.WriteLine($"#### didn't find file {k} for: [{ex.Message}]");
+                    if (fnd == "/home/rgesteve/projects/zlib-1.2.11/build/libz.so.1") {
+                        SymbolReaderLinux reader = SymbolReaderLinux.Load(fnd);
+                        var syms = reader.FunctionLocations().ToList();
+                        System.Diagnostics.Trace.WriteLine($"#### (in library) for file: [{fnd}] I found [{syms.Count}] symbols");
+                    } else {
+                        System.Diagnostics.Trace.WriteLine($"#### (in library) for file: [{fnd}], skipping symbol search");
+                    }
+                } catch (FileNotFoundException /* ex */) { // TODO: Do we need to handle this exception explicitly?
                     continue;
                 }
             }
