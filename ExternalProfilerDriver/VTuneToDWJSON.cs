@@ -210,14 +210,14 @@ namespace ExternalProfilerDriver
         public static IEnumerable<SampleWithTrace> ParseFromFile(string filename)
         {
 
-            var samples = VTuneStackParser.ReadFromFile(filename)
-                                          .Skip(1)
+            var samples = Utils.ReadFromFile(filename)
+                               .Skip(1)
 #if false
-                                          .Take(10)
+                               .Take(10)
 #endif
-                                          .Select(s => String.Join(",", s.Split(',')
-                                          .Select(VTuneStackParser.RemovePrePosComma)))
-                                          .ParseFromStream();
+                               .Select(s => String.Join(",", s.Split(',')
+                               .Select(VTuneStackParser.RemovePrePosComma)))
+                               .ParseFromStream();
 
             return samples;
         }
@@ -282,9 +282,9 @@ namespace ExternalProfilerDriver
 
             LongInt durationli = TraceUtils.ToNanoseconds(timeTotal);
 
-            var cpuRecords = VTuneStackParser.ReadFromFile(filename)
-                                            .Skip(2)
-                                            .ParseCPURecords();
+            var cpuRecords = Utils.ReadFromFile(filename)
+                                  .Skip(2)
+                                  .ParseCPURecords();
             /*
             CPUUtilRecord first = cpuRecords.First();
             CPUUtilRecord last = cpuRecords.Last();
