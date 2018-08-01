@@ -122,10 +122,15 @@ namespace ExternalProfilerDriver {
         }
     }
 
-    class FunctionSourceLocation
+    public class FunctionSourceLocation
     {
         public string Function { get; set; }
         public string SourceFile { get; set; }
         public long LineNumber { get; set; }
+        
+        override public string ToString()
+        {
+            return $"Function {Function} defined at {SourceFile}:{LineNumber}";
+        }
     }
 }
