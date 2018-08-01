@@ -24,6 +24,10 @@
     <None Update="mock-funcsline.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    
+    <None Update="objdump_output.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>
