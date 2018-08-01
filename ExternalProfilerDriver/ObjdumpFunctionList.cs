@@ -38,10 +38,19 @@ namespace ExternalProfilerDriver {
             }
         }
 
-        public IEnumerable<FunctionSourceLocation> FunctionLocations()
+        public IEnumerable<FunctionSourceLocation> FunctionLocations(string preParsedFile = null)
         {
             FunctionSourceLocation fsl = null;
-            foreach (var line in Utils.ReadFromFile(_sourceFile)) {
+            IEnumerable<string> gen;
+
+            if (preParsedFile != null) {
+                gen = Utils.ReadFromFile(preParsedFile);
+            } else {
+                gen = Utils.QuickExecute("objdump", $"-d -C -l --no-show-raw-insn {_sourceFile}");
+            }
+
+            // System.Diagnostics.Trace.WriteLine($"**** Going to try to parse {_sourceFile}");
+            foreach (var line in gen) {
                 if (line != null) {
                     Match mf = objdumpOutputFunction.Match(line);
                     if (mf.Success) {
