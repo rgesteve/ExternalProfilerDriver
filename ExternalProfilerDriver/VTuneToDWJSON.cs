@@ -261,9 +261,11 @@ namespace ExternalProfilerDriver
             foreach (var k in orig.Keys) {
                 try {
                     string fnd = Utils.FindFileInDir(k, symbolPath);
-                    System.Diagnostics.Trace.WriteLine($"#### (in library) found file: [{fnd}]");
+                    SymbolReaderLinux reader = SymbolReaderLinux.Load(fnd);
+                    var syms = reader.FunctionLocations().ToList();
+                    System.Diagnostics.Trace.WriteLine($"#### (in library) for file: [{fnd}] I found [{syms.Count}] symbols");
                 } catch (FileNotFoundException ex) {
-                    System.Diagnostics.Trace.WriteLine($"#### (in library) didn't find file {k} for: [{ex.Message}]");
+                    // System.Diagnostics.Trace.WriteLine($"#### didn't find file {k} for: [{ex.Message}]");
                     continue;
                 }
             }
