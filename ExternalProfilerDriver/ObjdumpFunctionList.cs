@@ -40,11 +40,9 @@ namespace ExternalProfilerDriver {
 
         public IEnumerable<FunctionSourceLocation> FunctionLocations()
         {
-            string line;
-            using (var reader = File.OpenText(_sourceFile)) {
-
-                FunctionSourceLocation fsl = null;
-                while ((line = reader.ReadLine()) != null) {
+            FunctionSourceLocation fsl = null;
+            foreach (var line in Utils.ReadFromFile(_sourceFile)) {
+                if (line != null) {
                     Match mf = objdumpOutputFunction.Match(line);
                     if (mf.Success) {
                         fsl = new FunctionSourceLocation() {
@@ -67,5 +65,6 @@ namespace ExternalProfilerDriver {
                 }
             }
         }
+
     }
 }
