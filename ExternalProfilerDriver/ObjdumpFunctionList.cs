@@ -49,7 +49,6 @@ namespace ExternalProfilerDriver {
                 gen = Utils.QuickExecute("objdump", $"-d -C -l --no-show-raw-insn {_sourceFile}");
             }
 
-            // System.Diagnostics.Trace.WriteLine($"**** Going to try to parse {_sourceFile}");
             foreach (var line in gen) {
                 if (line != null) {
                     Match mf = objdumpOutputFunction.Match(line);

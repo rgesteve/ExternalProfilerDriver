@@ -29,8 +29,8 @@ namespace ExternalProfilerDriverTest
             var dict = VTuneToDWJSON.ModuleFuncDictFromSamples(samples);
             Assert.IsTrue(dict.ContainsKey("libz.so.1"));
 
-            Assert.ThrowsException<ArgumentException>(() => VTuneToDWJSON.AddLineNumbers(dict, "/etc/test"));
-            var dd = VTuneToDWJSON.AddLineNumbers(dict, "/home/rgesteve/projects/zlib-1.2.11/build");
+            Assert.ThrowsException<ArgumentException>(() => VTuneToDWJSON.AddLineNumbers(ref dict, "/etc/test"));
+            VTuneToDWJSON.AddLineNumbers(ref dict, "/home/rgesteve/projects/zlib-1.2.11/build");
         }
 
         [TestMethod]

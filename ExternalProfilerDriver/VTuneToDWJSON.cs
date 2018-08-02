@@ -60,15 +60,22 @@ namespace ExternalProfilerDriver
     {
         public string FunctionName { get; set; }
         public string SourceFile { get; set; }
+        public long? LineNumber { get; set; }
         public long? Base { get; set; }
         public long? Size { get; set; }
         
-        public FuncInfo(string _functionname, string _sourceFile = "", long? _base = null, long? _size = null)
+        public FuncInfo(string _functionname, string _sourceFile = "", long? _lineNumber = null, long? _base = null, long? _size = null)
         {
             FunctionName = _functionname;
             SourceFile = _sourceFile;
+            LineNumber = _lineNumber;
             Base = _base;
             Size = _size;
+        }
+
+        override public string ToString()
+        {
+            return $"Function {this.FunctionName}, @ {this.SourceFile}:{this.LineNumber} and assigned Base/Size {this.Base}/{this.Size}";
         }
     }
     
@@ -251,20 +258,29 @@ namespace ExternalProfilerDriver
         ///
         /// TODO: maybe this function should take a list of possible directories to search?
         /// </summary>
-        public static Dictionary< string, Dictionary< string, FuncInfo > > AddLineNumbers(Dictionary< string, Dictionary< string, FuncInfo > > orig, string symbolPath)
+        //public static Dictionary< string, Dictionary< string, FuncInfo > > AddLineNumbers(ref Dictionary< string, Dictionary< string, FuncInfo > > orig, string symbolPath)
+        public static void AddLineNumbers(ref Dictionary< string, Dictionary< string, FuncInfo > > orig, string symbolPath)
         {
-
             if (!Directory.Exists(symbolPath)) {
                 throw new ArgumentException($"Cannot find specified directory: {symbolPath}");
             }
 
             foreach (var k in orig.Keys) {
                 try {
+                    // 1. Finding the pdb file
                     string fnd = Utils.FindFileInDir(k, symbolPath);
                     if (fnd == "/home/rgesteve/projects/zlib-1.2.11/build/libz.so.1") {
+
+                        // 2. Getting the symbols in the file
                         SymbolReaderLinux reader = SymbolReaderLinux.Load(fnd);
                         var syms = reader.FunctionLocations().ToList();
-                        System.Diagnostics.Trace.WriteLine($"#### (in library) for file: [{fnd}] I found [{syms.Count}] symbols");
+
+                          // 3. Get the information only for the functions that appear in the trace
+                          foreach ( var x in (orig[k].Join(syms, f => f.Key, fi => fi.Function, (f, fi) => fi)) ) {
+                              orig[k][x.Function].SourceFile = x.SourceFile;
+                              orig[k][x.Function].LineNumber = x.LineNumber;
+                          }
+
                     } else {
                         System.Diagnostics.Trace.WriteLine($"#### (in library) for file: [{fnd}], skipping symbol search");
                     }
@@ -272,7 +288,6 @@ namespace ExternalProfilerDriver
                     continue;
                 }
             }
-            return orig;
         }
 
         public static void CPUReportToDWJson(string filename, string outfname, double timeTotal = 0.0)
