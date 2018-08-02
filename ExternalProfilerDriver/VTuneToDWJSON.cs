@@ -20,6 +20,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 using System.Text;
+using System.Net;
 
 using Newtonsoft.Json;
 
@@ -193,7 +194,7 @@ namespace ExternalProfilerDriver
                     //duration = new LongInt(0, 10000)
                     duration = duration
                 },
-                name = "machine-name",
+                name = Dns.GetHostName() ?? "machine-name",
                 processor = new ProcessorSpec {
                     logicalCount = 4,
                     speedInMHz = 2670,
@@ -213,6 +214,8 @@ namespace ExternalProfilerDriver
         }
 
         /// <summary>
+        /// Returns an iterator of <cref>SampleWithTrace</cref> objects from a
+        /// VTune-generated callstack report.
         /// </summary>
         public static IEnumerable<SampleWithTrace> ParseFromFile(string filename)
         {
@@ -269,7 +272,9 @@ namespace ExternalProfilerDriver
                 try {
                     // 1. Finding the pdb file
                     string fnd = Utils.FindFileInDir(k, symbolPath);
+#if false
                     if (fnd == "/home/rgesteve/projects/zlib-1.2.11/build/libz.so.1") {
+#endif
 
                         // 2. Getting the symbols in the file
                         SymbolReaderLinux reader = SymbolReaderLinux.Load(fnd);
@@ -281,13 +286,72 @@ namespace ExternalProfilerDriver
                               orig[k][x.Function].LineNumber = x.LineNumber;
                           }
 
+#if false
                     } else {
                         System.Diagnostics.Trace.WriteLine($"#### (in library) for file: [{fnd}], skipping symbol search");
                     }
+#endif
                 } catch (FileNotFoundException /* ex */) { // TODO: Do we need to handle this exception explicitly?
                     continue;
                 }
             }
+        }
+        
+        public class SourceFileId
+        {
+            public string SourceFile { get; set; }
+            public int Id { get; set; }
+            public SourceFileId(string _sourceFile, int _id) {
+                SourceFile = _sourceFile;
+                Id = _id;
+            }
+        }
+        
+        public static Dictionary<string, List<SourceFileId>> SourceFilesByModule(Dictionary< string, Dictionary< string, FuncInfo > > modfun)
+        {
+
+            var modFile = modfun.Select( mfs => new { Module = mfs.Key, 
+                                                      FilesId = mfs.Value.Values.Select(fi => fi.SourceFile).Distinct().Where(f => File.Exists(f))
+                                                                         .Zip(Enumerable.Range(1, int.MaxValue), (x, y) => new SourceFileId(x, y) )
+                                                                         .ToList()
+                                                    })
+                                .Where(mfi => mfi.FilesId.Count > 0)
+                                .ToDictionary(mfi => mfi.Module, mfi => mfi.FilesId)
+                                ;
+
+            return modFile;
+
+        }
+
+        /// <summary>
+        /// Translates a two-level module -> func -> FuncInfo dictionary to the dwjson data model
+        /// </summary>
+        public static IEnumerable<ModuleSpec> ModFunToTrace(Dictionary< string, Dictionary< string, FuncInfo > > modfun)
+        {
+            foreach (var r in modfun.Zip(Enumerable.Range(1, int.MaxValue), (x, y) => new ModuleSpec() {
+                                                                                            name = x.Key,
+                                                                                            id = y,
+                                                                                            begin = new LongInt(0, 0), // should build these according to mfdd (i.e., argument x)
+                                                                                            end = new LongInt(0, 10000), // not sure why 2500 is the smallest number than seems to work
+                                                                                            @base = new LongInt(0, (y - 1) * 1000),
+                                                                                            size = new LongInt(0, 300)
+                                                                                      }))
+            {
+                yield return r;
+            }
+#if false
+           var mods = modfun.Zip(Enumerable.Range(1, int.MaxValue), (x, y) => new ModuleSpec() {
+                name = x.Key,
+                id = y,
+                begin = new LongInt(0, 0), // should build these according to mfdd (i.e., argument x)
+                end = new LongInt(0, 10000), // not sure why 2500 is the smallest number than seems to work
+                @base = new LongInt(0, (y - 1) * 1000),
+                size = new LongInt(0, 300),
+                // this assumes that the functions have already been assigned a base/size
+                ranges = x.Value.Select(xx => new FunctionSpec(xx.Key, xx.Value.Base, xx.Value.Size)).ToList()
+            });
+            var modBase = mods.ToDictionary(x => x.name, x => x.@base);
+#endif
         }
 
         public static void CPUReportToDWJson(string filename, string outfname, double timeTotal = 0.0)
