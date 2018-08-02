@@ -66,7 +66,7 @@ namespace ExternalProfilerDriver
         public IList<LongInt> frameIPs { get; set; }
     }
 
-    class FunctionSpec
+    public class FunctionSpec
     {
         public string name { get; set; }
         [JsonProperty("base")]
@@ -82,7 +82,7 @@ namespace ExternalProfilerDriver
         }
     }
 
-    class ModuleSpec
+    public class ModuleSpec
     {
         public string name { get; set; }
         public int id { get; set; }
@@ -112,7 +112,7 @@ namespace ExternalProfilerDriver
         }
     }
 
-    class LineSpec
+    public class LineSpec
     {
       public int fileId      { get; set; }
       public int offset      { get; set; } 
@@ -122,7 +122,7 @@ namespace ExternalProfilerDriver
       public int columnEnd   {get; set; } 
     }
 
-    class FileIDMapSpec
+    public class FileIDMapSpec
     {
         public int id { get; set; }
         public string file { get; set; }
