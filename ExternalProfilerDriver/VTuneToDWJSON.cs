@@ -55,6 +55,13 @@ namespace ExternalProfilerDriver
                 _current += _size + 1;
             }
         }
+        public void Restart()
+        {
+            _current = 0;
+        }
+        
+        public long Size { get { return _size; } }
+        
     }
 
     public class FuncInfo
@@ -328,6 +335,65 @@ namespace ExternalProfilerDriver
         /// </summary>
         public static IEnumerable<ModuleSpec> ModFunToTrace(Dictionary< string, Dictionary< string, FuncInfo > > modfun)
         {
+            var mfiles = SourceFilesByModule(modfun);
+            var mfilesDWJSON = mfiles.Select(kv => new { Module = kv.Key, 
+                                                         Files = kv.Value.Select(fi => new FileIDMapSpec {id = fi.Id, file = fi.SourceFile}).ToList()
+                                                       })
+                                     .ToDictionary(k => k.Module, v => v.Files);
+                                     
+            /*
+            This means that, to find the id that has been assigned to a filename in this structure we need something like:
+            var idx = mfilesDWJSON[<module>].FindIndex(fi => fi.file == <filename>);
+            var y = mfilesDWJSON[<module>][x];
+            */
+            
+            // Generate LineSpecs for each function in the module
+            List<LineSpec> lines = new List<LineSpec>();
+            foreach (var mf in modfun.Select(mfd => new { Module = mfd.Key, Fnames = mfd.Value.Select(ffi => ffi.Value).ToList()})) {
+                System.Diagnostics.Trace.WriteLine($"**** (in library), {mf.Module}");
+                foreach (var ff in mf.Fnames) {
+                    // look up information on function
+                    // new FuncSpec
+                    if (mfilesDWJSON.ContainsKey(mf.Module)) {
+                        int idx = mfilesDWJSON[mf.Module].FindIndex(fi => fi.file == ff.SourceFile);
+                        if (idx > 0) {
+                            var idForFun = mfilesDWJSON[mf.Module][idx].id;
+                            LineSpec found = new LineSpec {
+                                fileId = idForFun,
+                                offset = 10,
+                                lineBegin = (int)(ff.LineNumber ?? 0),
+                                lineEnd = (int)(ff.LineNumber ?? 1),
+                                columnBegin = 0,
+                                columnEnd = 1
+                            };
+                            string json = JsonConvert.SerializeObject(found, Formatting.Indented);
+                            
+                            System.Diagnostics.Trace.WriteLine($"**** \t(in library), lines for function {ff.FunctionName} are {json}");
+                        }
+                    }
+                }
+
+            }
+            
+#if false
+            - FunctionSpec
+              - name
+              - @base
+              - size
+              - lines : IList<LineSpec> 
+                - fileId
+                - offset 
+                - lineBegin 
+                - lineEnd 
+                - columnBegin
+                - columnEnd
+#endif
+
+
+            return null;
+            
+
+#if false
             foreach (var r in modfun.Zip(Enumerable.Range(1, int.MaxValue), (x, y) => new ModuleSpec() {
                                                                                             name = x.Key,
                                                                                             id = y,
@@ -339,6 +405,7 @@ namespace ExternalProfilerDriver
             {
                 yield return r;
             }
+#endif
 #if false
            var mods = modfun.Zip(Enumerable.Range(1, int.MaxValue), (x, y) => new ModuleSpec() {
                 name = x.Key,
@@ -405,6 +472,9 @@ namespace ExternalProfilerDriver
         }
     }
 
+    /// <summary>
+    /// Auxiliary class to translate "address" from a module/function spec.
+    /// </summary>
     public class AddressTranslator
     {
         private Dictionary<string, Dictionary<string, BaseSizeTuple>> modfundict;
