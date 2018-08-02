@@ -17,7 +17,7 @@ namespace ExternalProfilerDriver {
     {
         string _sourceFile;
         
-        private Regex objdumpAsmOutputRE    = new Regex(@"^\s*([0-9a-dA-D]+):\s+(.*)");
+        private Regex objdumpAsmOutputRE    = new Regex(@"^\s*([0-9a-fA-F]+):\s+(.*)");
         private Regex objdumpOutputFileLine = new Regex(@"^(.*):([0-9]+)");
         private Regex objdumpOutputFunction = new Regex(@"^(\S.*)\(\):");
 
