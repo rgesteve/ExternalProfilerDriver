@@ -30,7 +30,19 @@ namespace ExternalProfilerDriverTest
             Assert.IsTrue(dict.ContainsKey("libz.so.1"));
 
             Assert.ThrowsException<ArgumentException>(() => VTuneToDWJSON.AddLineNumbers(ref dict, "/etc/test"));
+            int initial_count = dict.Count;
             VTuneToDWJSON.AddLineNumbers(ref dict, "/home/rgesteve/projects/zlib-1.2.11/build");
+            Assert.AreEqual(initial_count, dict.Count);
+
+            foreach (var r in VTuneToDWJSON.ModFunToTrace(dict)) {
+                Trace.WriteLine($"**** Got module {r.name}, assigned id: [{r.id}]");
+            }
+            
+            var mfiles = VTuneToDWJSON.SourceFilesByModule(dict);
+            foreach (var r in mfiles) {
+                System.Diagnostics.Trace.WriteLine($"**** (from test) found ({r.Value.Count}) files in module {r.Key}.");
+            }
+
         }
 
         [TestMethod]
