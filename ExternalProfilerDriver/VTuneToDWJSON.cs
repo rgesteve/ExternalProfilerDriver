@@ -385,7 +385,8 @@ namespace ExternalProfilerDriver
             }
 
 #if false
-                string json = JsonConvert.SerializeObject(modulesInTrace, Formatting.Indented);
+                string json = JsonConvert.SerializeObject(modulesInTrace, Formatting.Indented, new JsonSerializerSettings {
+                    NullValueHandling = NullValueHandling.Ignore});
                 System.Diagnostics.Trace.WriteLine($"**** \t(in library), for this trace, the dwjson for modules is {json}.");
 #endif
 
