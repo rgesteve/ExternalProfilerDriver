@@ -15,7 +15,7 @@ namespace ExternalProfilerDriverTest
     {
         [TestMethod]
         [DeploymentItem("zlib_example.csv")]
-        public void TestDeploymentItem()
+        public void TestParsingTrace()
         {
             string filename = "zlib_example.csv";
             int expected_sample_count = 5;
@@ -26,23 +26,32 @@ namespace ExternalProfilerDriverTest
 
             Assert.IsInstanceOfType(samples[0], typeof(SampleWithTrace));
 
+            string known_module = "libz.so.1";
             var dict = VTuneToDWJSON.ModuleFuncDictFromSamples(samples);
-            Assert.IsTrue(dict.ContainsKey("libz.so.1"));
+            Assert.IsTrue(dict.ContainsKey(known_module));
 
             Assert.ThrowsException<ArgumentException>(() => VTuneToDWJSON.AddLineNumbers(ref dict, "/etc/test"));
             int initial_count = dict.Count;
             VTuneToDWJSON.AddLineNumbers(ref dict, "/home/rgesteve/projects/zlib-1.2.11/build");
             Assert.AreEqual(initial_count, dict.Count);
 
+            var mfiles = VTuneToDWJSON.SourceFilesByModule(dict);
+            int expected_source_files = 3; // this assumes that files are installed in the machine where the tests are run, should mock it instead
+            Assert.AreEqual(expected_source_files, mfiles[known_module].Count);
+            
+#if false
+            var x = mfilesDWJSON["libz.so.1"].FindIndex(fi => fi.file == "/home/rgesteve/projects/zlib-1.2.11/build/../adler32.c");
+            var y = mfilesDWJSON["libz.so.1"][x];
+#endif
+
+#if true
+            VTuneToDWJSON.ModFunToTrace(dict);
+            // SequenceBaseSize
+#else
             foreach (var r in VTuneToDWJSON.ModFunToTrace(dict)) {
                 Trace.WriteLine($"**** Got module {r.name}, assigned id: [{r.id}]");
             }
-            
-            var mfiles = VTuneToDWJSON.SourceFilesByModule(dict);
-            foreach (var r in mfiles) {
-                System.Diagnostics.Trace.WriteLine($"**** (from test) found ({r.Value.Count}) files in module {r.Key}.");
-            }
-
+#endif
         }
 
         [TestMethod]

@@ -26,6 +26,14 @@ namespace ExternalProfilerDriverTest
         }
         
         [TestMethod]
+        public void TestSequenceBaseSizeSequence()
+        {
+            int expected_size = 10;
+            var sbs = new SequenceBaseSize();
+            Assert.AreEqual(sbs.Size, expected_size);
+        }
+        
+        [TestMethod]
         public void TestGeneratedSample()
         {
             var sbs = (new SequenceBaseSize()).Generate().Take(10).ToList();

@@ -348,15 +348,21 @@ namespace ExternalProfilerDriver
             */
             
             // Generate LineSpecs for each function in the module
-            List<LineSpec> lines = new List<LineSpec>();
+            List<ModuleSpec> modulesInTrace = new List<ModuleSpec>();
             foreach (var mf in modfun.Select(mfd => new { Module = mfd.Key, Fnames = mfd.Value.Select(ffi => ffi.Value).ToList()})) {
-                System.Diagnostics.Trace.WriteLine($"**** (in library), {mf.Module}");
+
+                ModuleSpec currentModule = new ModuleSpec {
+                    name = mf.Module
+                };
+                List<FunctionSpec> funcsInCurrentModule = new List<FunctionSpec>();
                 foreach (var ff in mf.Fnames) {
+                    //FunctionSpec currrent = new FunctionSpec (ff.FunctionName, ff.Base, ff.Size);
+                    FunctionSpec current = new FunctionSpec (ff.FunctionName, 0,0);
+
                     // look up information on function
-                    // new FuncSpec
                     if (mfilesDWJSON.ContainsKey(mf.Module)) {
                         int idx = mfilesDWJSON[mf.Module].FindIndex(fi => fi.file == ff.SourceFile);
-                        if (idx > 0) {
+                        if (idx >= 0) {
                             var idForFun = mfilesDWJSON[mf.Module][idx].id;
                             LineSpec found = new LineSpec {
                                 fileId = idForFun,
@@ -366,32 +372,24 @@ namespace ExternalProfilerDriver
                                 columnBegin = 0,
                                 columnEnd = 1
                             };
-                            string json = JsonConvert.SerializeObject(found, Formatting.Indented);
-                            
-                            System.Diagnostics.Trace.WriteLine($"**** \t(in library), lines for function {ff.FunctionName} are {json}");
+                            current.lines = Utils.Emit<LineSpec>(found).ToList();
                         }
                     }
+                    funcsInCurrentModule.Add(current);
                 }
-
+                currentModule.ranges = funcsInCurrentModule;
+                if (mfilesDWJSON.ContainsKey(currentModule.name)) { // maybe should use the description used thus far
+                    currentModule.fileIdMapping = mfilesDWJSON[currentModule.name];
+                }
+                modulesInTrace.Add(currentModule);
             }
-            
+
 #if false
-            - FunctionSpec
-              - name
-              - @base
-              - size
-              - lines : IList<LineSpec> 
-                - fileId
-                - offset 
-                - lineBegin 
-                - lineEnd 
-                - columnBegin
-                - columnEnd
+                string json = JsonConvert.SerializeObject(modulesInTrace, Formatting.Indented);
+                System.Diagnostics.Trace.WriteLine($"**** \t(in library), for this trace, the dwjson for modules is {json}.");
 #endif
 
-
-            return null;
-            
+            return modulesInTrace;
 
 #if false
             foreach (var r in modfun.Zip(Enumerable.Range(1, int.MaxValue), (x, y) => new ModuleSpec() {
