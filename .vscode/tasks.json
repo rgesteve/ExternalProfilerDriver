@@ -10,6 +10,16 @@
                 "${workspaceFolder}/ExternalProfilerDriver/ExternalProfilerDriverNetStandard.csproj"
             ],
             "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "restore",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "restore",
+                "${workspaceFolder}/ExternalProfilerDriver/ExternalProfilerDriverNetStandard.csproj"
+            ],
+            "problemMatcher": "$msCompile"
         }
     ]
 }
