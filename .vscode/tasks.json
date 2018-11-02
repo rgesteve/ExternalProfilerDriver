@@ -1,0 +1,23 @@
+{
+    "version" : "2.0.0",
+    "tasks" : [
+        {
+            "label" : "build",
+            "windows" : {
+                "command" : "dotnet build ExternalProfilerDriver\\ExternalProfilerDriverNetStandard.csproj"
+            },
+            "type" : "shell",
+            "group" : {
+                "kind" : "build",
+                "isDefault" : true
+            },
+            "presentation" : {
+                "reveal" : "always"
+            },
+            "options" : {
+                "cwd" : "${workspaceFolder}"
+            },
+            "problemMatcher" : "$msCompile"
+        }
+    ]
+}
