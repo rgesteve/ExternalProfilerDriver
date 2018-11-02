@@ -51,6 +51,7 @@ namespace ExternalProfilerDriver
         // source $(VTUNE_INSTALL_PATH)/amplxe-vars.sh
         private const string _vtune17Envvar = "VTUNE_AMPLIFIER_2017_DIR";
         private const string _vtune18Envvar = "VTUNE_AMPLIFIER_2018_DIR";
+        private const string _vtune19Envvar = "VTUNE_AMPLIFIER_2019_DIR";
         private const string _vtuneExeBasename = "amplxe-cl";
 
         public static string VTunePath()
@@ -61,7 +62,8 @@ namespace ExternalProfilerDriver
                  RuntimeEnvironment.OperatingSystemPlatform == Platform.Linux)
             {
                 envvarval = Environment.GetEnvironmentVariable(_vtune17Envvar) ??
-                    Environment.GetEnvironmentVariable(_vtune18Envvar) ?? throw new VTuneNotInstalledException();
+                    Environment.GetEnvironmentVariable(_vtune18Envvar) ??
+                        Environment.GetEnvironmentVariable(_vtune19Envvar) ?? throw new VTuneNotInstalledException();
             }
             else
             {
