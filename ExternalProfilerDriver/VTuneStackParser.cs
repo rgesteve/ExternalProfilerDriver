@@ -19,7 +19,11 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
+using System.Globalization;
+using System.Text;
 using System.Text.RegularExpressions;
+
+using CsvHelper;
 
 namespace ExternalProfilerDriver
 {
@@ -55,34 +59,26 @@ namespace ExternalProfilerDriver
         private List<List<PerformanceSample>> _stacks = new List<List<PerformanceSample>>();
         public PerformanceSample TOSFrame { get; }
 
-        public IEnumerable<IEnumerable<PerformanceSample>> Stacks
-        {
-            get
-            {
-                foreach (var s in _stacks)
-                {
+        public IEnumerable<IEnumerable<PerformanceSample>> Stacks {
+            get {
+                foreach (var s in _stacks) {
                     yield return s.AsEnumerable();
                 }
             }
         }
 
-        public SampleWithTrace(PerformanceSample sample)
-        {
+        public SampleWithTrace(PerformanceSample sample) {
             TOSFrame = sample;
         }
 
-        public void AddStack(List<PerformanceSample> stack)
-        {
+        public void AddStack(List<PerformanceSample> stack) {
             _stacks.Add(stack);
         }
 
-        public IEnumerable<PerformanceSample> AllSamples()
-        {
+        public IEnumerable<PerformanceSample> AllSamples() {
             yield return TOSFrame; // assumes this is not null
-            foreach (var stack in Stacks)
-            {
-                foreach (var frame in stack)
-                {
+            foreach (var stack in Stacks) {
+                foreach (var frame in stack) {
                     yield return frame;
                 }
             }
@@ -118,8 +114,7 @@ namespace ExternalProfilerDriver
             List<PerformanceSample> currentStack = null;
             bool atEnd = false;
 
-            foreach (var l in seq)
-            {
+            foreach (var l in seq) {
                 Match m = startsWithComma.Match(l);
 
                 if (!m.Success) // top of the stack (associated with time?)
@@ -192,5 +187,62 @@ namespace ExternalProfilerDriver
             }
         }
     }
+
+    static class VTuneStackParserForCPP
+    {
+        public static IEnumerable<SampleWithTrace> ParseFromFile(string filename)
+        {
+            if (!File.Exists(filename)) {
+                throw new ArgumentException($"Path {filename} does not exist.");
+            }
+
+            SampleWithTrace current = null;
+            List<PerformanceSample> currentStack = new List<PerformanceSample>();
+
+            uint index = 0;
+            using (var reader = new StreamReader(filename)) {
+                using (CsvReader csvReader = new CsvReader(reader)) {
+
+                    while (csvReader.Read()) {
+                        var row = csvReader.GetRecord<dynamic>();
+                        var dict = row as IDictionary<string, object>;
+
+                            if (dict["Function"] == null || dict["Function"].ToString() == string.Empty) {
+                                if (dict["Function Stack"] == null || dict["Function Stack"].ToString() == string.Empty) {
+                                    current.AddStack(currentStack);
+                                    currentStack = new List<PerformanceSample>();
+                                } else {
+                                    PerformanceSample s = new PerformanceSample(dict["Function Stack"].ToString(), 
+                                                                                dict["CPU Time"].ToString(),
+                                                                                dict["Module"].ToString(),
+                                                                                dict["Function (Full)"].ToString(),
+                                                                                dict["Source File"].ToString(),
+                                                                                dict["Start Address"].ToString());
+                                    currentStack.Add(s);
+                                }
+                            } else {
+                                if (current != null) {
+                                    yield return current;
+                                }
+                                PerformanceSample s = new PerformanceSample(dict["Function"].ToString(), 
+                                                                            dict["CPU Time"].ToString(),
+                                                                            dict["Module"].ToString(),
+                                                                            dict["Function (Full)"].ToString(),
+                                                                            dict["Source File"].ToString(),
+                                                                            dict["Start Address"].ToString()
+                                );
+
+                                current = new SampleWithTrace(s);
+                            }
+                            index += 1;
+                    }
+                }
+            }
+            if (current != null) {
+                yield return current;
+            }
+        }
+    }
+
 }
 
