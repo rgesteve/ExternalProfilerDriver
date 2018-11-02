@@ -1,6 +1,31 @@
 {
     "version" : "2.0.0",
+    "windows" : {
+        "options" : {
+            "shell" : {
+                "executable" : "powershell.exe"
+            }
+        }
+    },
     "tasks" : [
+        {
+            "label" : "clean",
+            "windows" : {
+                "command" : "Get-ChildItem .\\ExternalProfilerDriver -include bin,obj -Recurse | foreach ($_) { Remove-Item $_.fullname -Force -Recurse } "
+            },
+            "type" : "shell",
+            "group" : {
+                "kind" : "build",
+                "isDefault" : true
+            },
+            "presentation" : {
+                "reveal" : "always"
+            },
+            "options" : {
+                "cwd" : "${workspaceFolder}"
+            },
+            "problemMatcher" : "$msCompile"
+        },
         {
             "label" : "build",
             "windows" : {
