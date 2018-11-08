@@ -286,9 +286,11 @@ namespace ExternalProfilerDriver
             sb.Append(" " + UserDataDirCLI());
             sb.Append(" " + ResultDirCLI);
             
+#if false
             if (this.SymbolPath != String.Empty) {
                 sb.Append($" -search-dir {this.SymbolPath}");
             }
+#endif
             
             sb.Append(WorkloadCLI);
             return sb.ToString();

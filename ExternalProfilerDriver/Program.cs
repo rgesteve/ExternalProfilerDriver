@@ -124,6 +124,7 @@ namespace ExternalProfilerDriver
 
                                 // If output directory requested and it does not exist, create it
 
+#if false
                                 if (!opts.DryRunRequested) {
                                     if (opts.DWJsonOutDir == null) {
                                         Console.WriteLine($"Need an output directory unless in dry run.");
@@ -140,6 +141,9 @@ namespace ExternalProfilerDriver
                                         dwjsonDir = opts.DWJsonOutDir;
                                     }
                                 }
+#else
+                                dwjsonDir = @"c:\users\perf\temp";
+#endif
 
                                 if (!opts.DryRunRequested) {
                                     Console.WriteLine($"Collect command line is: [ {vtuneExec} {vtuneCollectArgs} ]");
