@@ -26,10 +26,11 @@
             },
             "problemMatcher" : "$msCompile"
         },
+
         {
-            "label" : "build",
+            "label" : "restore",
             "windows" : {
-                "command" : "dotnet build ExternalProfilerDriver\\ExternalProfilerDriverNetStandard.csproj"
+                "command" : "dotnet restore"
             },
             "type" : "shell",
             "group" : {
@@ -43,6 +44,45 @@
                 "cwd" : "${workspaceFolder}"
             },
             "problemMatcher" : "$msCompile"
-        }
+        },
+
+        {
+            "label" : "build",
+            "windows" : {
+                "command" : "dotnet build -f netcoreapp2.0 ExternalProfilerDriver\\ExternalProfilerDriver.csproj"
+            },
+            "type" : "shell",
+            "group" : {
+                "kind" : "build",
+                "isDefault" : true
+            },
+            "presentation" : {
+                "reveal" : "always"
+            },
+            "options" : {
+                "cwd" : "${workspaceFolder}"
+            },
+            "problemMatcher" : "$msCompile"
+        },
+
+        {
+            "label" : "publish",
+            "windows" : {
+                "command" : "dotnet publish -f netcoreapp2.0 ExternalProfilerDriver\\ExternalProfilerDriver.csproj"
+            },
+            "type" : "shell",
+            "group" : {
+                "kind" : "build",
+                "isDefault" : true
+            },
+            "presentation" : {
+                "reveal" : "always"
+            },
+            "options" : {
+                "cwd" : "${workspaceFolder}"
+            },
+            "problemMatcher" : "$msCompile"
+        },
+
     ]
 }
