@@ -263,3 +263,5 @@ __pycache__/
 # Jupyter and Jupyterlab checkpoints
 .ipynb_checkpoints/
 
+# Backup files
+*.bak*
