@@ -43,7 +43,7 @@ namespace ExternalProfilerDriver
 #if true
             Console.WriteLine($"Parsing file: {filename} int output {outfname}.");
             foreach(var s in samples) {
-                Console.WriteLine($"sample: ${s.ToString()}");
+                Console.WriteLine($"sample: {s.TOSFrame.ToString()}");
             }
 #else
             var trace = new Trace {

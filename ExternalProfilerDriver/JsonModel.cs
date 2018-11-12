@@ -33,132 +33,66 @@ namespace ExternalProfilerDriver
         public List<string> cpu;
     }
 
-#if false
-    class ProcessSpec
-    {
-        public string name { get; set; }
-        public int id { get; set; }
-        public LongInt begin { get; set; }
-        public LongInt end { get; set; }
-        public bool isTarget { get; set; }
-        public bool isUser { get; set; }
-        public IList<int> moduleIDs { get; set; }
-        public IList<ThreadSpec> threads { get; set; }
-    }
+    /*
+    var columnDefs = [
+    {headerName: "Function", field: 'function', cellRenderer:'agGroupCellRenderer'},
+    {headerName: "CPU Time", field: "cpu_time"},
+    {headerName: "Module", field: "module"},
+    {headerName: "Function (Full)", field: "function_full"},
+    {headerName: "Source File", field: "source_file"},
+    {headerName: "Start Address", field: "start_address"}
+];
+     */
+     /* profile data:
 
-    class FrameInfo
-    {
-        public LongInt timestamp { get; set; }
-        public IList<LongInt> frameIPs { get; set; }
-    }
+     [{"function": "func@0x1e0897c0", "cpu_time": "12.703125", "module": "python36.dll", "function_full": "func@0x1e0897c0", "source_file": "Unknown", "start_address": "Unknown", 
+    "children":[
+        {"function":"_scrt_common_main_seh", "cpu_time": "12.703125", "module": "python.exe", "function_full": "_scrt_common_main_seh", "source_file": "exe_common.inl", "start_address": "0x1d001150"},
+        {"function":"BaseThreadInitThunk", "cpu_time": "0", "module": "KERNEL32.DLL", "function_full": "BaseThreadInitThunk", "source_file": "[Unknown]", "start_address": "0x180012760"},
+        {"function":"RtlUserThreadStart", "cpu_time": "0", "module": "ntdll.dll", "function_full": "RtlUserThreadStart", "source_file": "[Unknown]", "start_address": "0x180070d30"}
+    ]},
+    {"function": "jpeg_idct_16x16", "cpu_time": "1.538451", "module": "opencv_imgcodecs331.dll", "function_full": "peg_idct_16x16", "source_file": "[Unknown]", "start_address": "0x180131d90",
+    "children": [
+        {"function": "func@0x180123b90"         ,"cpu_time": "1.538451","module": "opencv_imgcodecs331.dll", "function_full": "func@0x180123b90",  "source_file": "[Unknown]", "start_address": "0x180123b90" },
+        {"function": "func@0x1801233b0"         ,"cpu_time": "0",       "module": "opencv_imgcodecs331.dll", "function_full": "func@0x1801233b0",  "source_file": "[Unknown]", "start_address": "0x1801233b0" },
+        {"function": "jpeg_read_scanlines"      ,"cpu_time": "0",       "module": "opencv_imgcodecs331.dll", "function_full": "jpeg_read_scanlines","source_file": "[Unknown]", "start_address": "0x18011c900"},
+        {"function": "cv::JpegDecoder::readData","cpu_time": "0",       "module": "opencv_imgcodecs331.dll", "function_full": "cv::JpegDecoder::readData(class cv::Mat &)", "source_file": "grfmt_jpeg.cpp", "start_address": "0x1800277a0"},
+        {"function": "cv::imdecode_"            ,"cpu_time": "0",       "module": "opencv_imgcodecs331.dll", "function_full": "cv::imdecode_",      "source_file": "loadsave.cpp", "start_address": "0x18000eb10"}
 
-    public class FunctionSpec
-    {
-        public string name { get; set; }
-        [JsonProperty("base")]
-        public LongInt @base { get; set; }
-        public LongInt size { get; set; }
-        public IList<LineSpec> lines { get; set; }
+    ]},
+    {"function": "jpeg_idct_islow" , "cpu_time": "1.214521", "module": "opencv_imgcodecs331.dll", "function_full": "jpeg_idct_16x16" , "source_file":"jpeg_idct_islow,[Unknown]", "start_address": "0x180135c20",
+    "children": [
+        {"function": "func@0x180123b90", "cpu_time": "1.203510", "module": "opencv_imgcodecs331.dll", "function_full": "func@0x180123b90", "source_file":"[Unknown]", "start_address": "0x180123b90"},
+        {"function": "func@0x1801233b0", "cpu_time": "0"       , "module": "opencv_imgcodecs331.dll", "function_full": "func@0x1801233b0", "source_file":"[Unknown]", "start_address": "0x1801233b0"}
+    
+    ]}]
+      */
 
-        public FunctionSpec(string _name, long _base, long _size)
-        {
-            name = _name;
-            @base = new LongInt(0, _base);
-            size = new LongInt(0, _size);
-        }
-    }
+      /*
+              {"function":"_scrt_common_main_seh", 
+              "cpu_time": "12.703125", 
+              "module": "python.exe", 
+              "function_full": "_scrt_common_main_seh", 
+              "source_file": "exe_common.inl", 
+              "start_address": "0x1d001150"},
 
-    public class ModuleSpec
-    {
-        public string name { get; set; }
-        public int id { get; set; }
-        public LongInt begin { get; set; }
-        public LongInt end { get; set; }
-        [JsonProperty("base")]
-        public LongInt @base { get; set; }
-        public LongInt size { get; set; }
-        public IList<FunctionSpec> ranges { get; set; }
-        public IList<FileIDMapSpec> fileIdMapping { get; set; }
+       */
 
-        public ModuleSpec()
-        {
-            /* empty */
-        }
-        public ModuleSpec(string _name, int _id, IEnumerable<FunctionSpec> _ranges)
-        {
-            name = _name;
-            id = _id;
-            ranges = _ranges.ToList();
-        }
+       /// <summary>
+       /// Looks like this is a straightforward version of PerformanceSample
+       /// </summary>       
+       class FunctionSummarySpec
+       {
+           public string function { get; set; }
+           public string cpu_time { get; set; }
+           public string module { get; set; }
+           public string function_full {get; set;}
+           public string source_file { get; set; }
+           public string start_address {get; set;}
+       }
 
-        public ModuleSpec(string _name, IEnumerable<FunctionSpec> _ranges)
-        {
-            name = _name;
-            ranges = _ranges.ToList();
-        }
-    }
-
-    public class LineSpec
-    {
-      public int fileId      { get; set; }
-      public int offset      { get; set; } 
-      public int lineBegin   {get; set; } 
-      public int lineEnd     {get; set; } 
-      public int columnBegin {get; set; } 
-      public int columnEnd   {get; set; } 
-    }
-
-    public class FileIDMapSpec
-    {
-        public int id { get; set; }
-        public string file { get; set; }
-    }
-
-    class ThreadSpec
-    {
-        public int id { get; set; }
-        public LongInt begin { get; set; }
-        public LongInt end { get; set; }
-        public IList<FrameInfo> stacks { get; set; }
-    }
-
-    class Trace
-    {
-        public TimeSpec totalTimeRange { get; set; }
-        public string name { get; set; }
-        public ProcessorSpec processor { get; set; }
-        public IList<ProcessSpec> processes { get; set; }
-
-        public IList<ModuleSpec> modules { get; set; }
-    }
-
-    class CPUUtilTrace
-    {
-        public LongInt beginTime = null;
-        public LongInt duration = null;
-        public IList<ValueTrace> counters = null;
-    }
-
-    class ValueTrace
-    {
-        public string id;
-        public IList<CPUSample> p;
-        public ValueTrace(IEnumerable<CPUSample> samples)
-        {
-            id = "DiagnosticsHub.Counters.Process.CPU";
-            p = samples.ToList();
-        }
-    }
-
-    class CPUSample
-    {
-        public LongInt t;
-        public float v;
-        public CPUSample(LongInt _t, float _v)
-        {
-            t = _t;
-            v = _v;
-        }
-    }
-#endif
+       class CallTreeSpec : FunctionSummarySpec
+       {
+           public List<FunctionSummarySpec> children {get; set;}
+       }
 }
