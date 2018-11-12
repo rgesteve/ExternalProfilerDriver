@@ -175,13 +175,15 @@ namespace ExternalProfilerDriver
                                 Console.WriteLine($"(Which I should process and dump at directory [{dwjsonDir}]");
 */
                                 if ( opts.JsonOutput) {
+                                    // this is different from generating DWJSON in that a single JSON object is generated, not two files
                                     // workload @"C:\users\perf\appdata\local\continuum\anaconda3\python.exe" "c:\users\perf\projects\examples\pybind\test\test.py"
-                                    Console.WriteLine($"Should be generating JSON code from {repspec.ReportOutputFile}.");
-
 #if false
-                                    double runtime = VTuneToDWJSON.CSReportToDWJson(repspec.ReportOutputFile, Path.Combine(dwjsonDir,"Sample.dwjson"));
-                                    VTuneToDWJSON.CPUReportToDWJson(reptimespec.ReportOutputFile, Path.Combine(dwjsonDir, "Session.counters"), runtime);
-                                    #endif
+                                    double runtime = VTuneToJSON.CSReportToJson(repspec.ReportOutputFile, Path.Combine(dwjsonDir,"Sample.dwjson"));
+                                    VTuneToJSON.CPUReportToJson(reptimespec.ReportOutputFile, Path.Combine(dwjsonDir, "Session.counters"), runtime);
+#else
+                                    double runtime = VTuneToJSON.CSReportToJson(repspec.ReportOutputFile, "<placeholder>");
+                                    VTuneToJSON.CPUReportToJson(reptimespec.ReportOutputFile, "<placeholder>", runtime);
+#endif
 
                                     Environment.Exit(0);
                                 } else {

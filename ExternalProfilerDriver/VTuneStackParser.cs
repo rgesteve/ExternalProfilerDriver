@@ -186,6 +186,15 @@ namespace ExternalProfilerDriver
                 yield return current;
             }
         }
+
+        public static IEnumerable<SampleWithTrace> ParseFromFile(string filename) {
+            var samples = Utils.ReadFromFile(filename)
+                               .Skip(1)
+                               .Select(s => String.Join(",", s.Split(',')
+                               .Select(/* VTuneStackParser.*/RemovePrePosComma)))
+                               .ParseFromStream();
+            return samples;
+        }
     }
 
     static class VTuneStackParserForCPP
