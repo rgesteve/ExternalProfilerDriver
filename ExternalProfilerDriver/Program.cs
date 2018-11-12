@@ -49,6 +49,9 @@ namespace ExternalProfilerDriver
         [Option('d', "dwjsondir", HelpText = "Specify the directory in which to dump resulting dwjson (contents are overwritten)")]
         public string DWJsonOutDir { get; set; }
 
+	[Option('j', "json", HelpText = "Specify whether json output suitable for vscode is to be generated")]
+	public bool JsonOutput { get; set; }
+
         [Value(0)]
         public IEnumerable<string> Rest { get; set; }
     }
@@ -67,6 +70,8 @@ namespace ExternalProfilerDriver
             var res = parser.ParseArguments<ProgramOptions>(args)
                             .WithParsed<ProgramOptions>(opts => {
 
+// whether we should run from pre-generated report
+#if false
                                 if (opts.CallStackFNameToParse != null) {
                                     try {
                                         // TODO: test /tmp/results_20180314/r_stacks_0004.csv
@@ -84,6 +89,7 @@ namespace ExternalProfilerDriver
 
                                     Environment.Exit(0);
                                 }
+#endif
 
                                 string vtuneExec = "";
 
@@ -94,8 +100,7 @@ namespace ExternalProfilerDriver
                                     Environment.Exit(1);
                                 }
 
-                                if (opts.ReportVTunePath)
-                                {
+                                if (opts.ReportVTunePath) {
                                     Console.WriteLine($"The path of VTune is: {vtuneExec}");
                                     Environment.Exit(0);
                                 }
@@ -105,8 +110,7 @@ namespace ExternalProfilerDriver
                                 }
                                 
                                 var RestArgs = opts.Rest.ToList();
-                                VTuneCollectHotspotsSpec spec = new VTuneCollectHotspotsSpec()
-                                {
+                                VTuneCollectHotspotsSpec spec = new VTuneCollectHotspotsSpec() {
                                     WorkloadSpec = String.Join(" ", RestArgs)
                                 };
                                 
