@@ -81,10 +81,6 @@ namespace ExternalProfilerDriver
             }
 #endif
 
-#if true
-            Console.WriteLine($"Should be parsing CPU time util report from {filename}.");
-#endif
-
 #if false
             LongInt durationli = TraceUtils.ToNanoseconds(timeTotal);
 #endif
@@ -93,38 +89,10 @@ namespace ExternalProfilerDriver
                                   .Skip(2)
                                   .ParseCPURecords();
 
-#if true
-            foreach(var r in cpuRecords) {
-                Console.WriteLine($"got new record {r.ToString()}.");
-            }
-#endif
-            /*
-            CPUUtilRecord first = cpuRecords.First();
-            CPUUtilRecord last = cpuRecords.Last();
-
-            CPUUtilTrace trace = new CPUUtilTrace();
-            trace.beginTime = new LongInt(0, (long)(first.Start));
-            trace.duration = new LongInt(0, (long)(last.End - first.Start));
-            trace.counters = new List<ValueTrace> { new ValueTrace(cpuRecords.Select(r => new CPUSample(new LongInt(0, (long)r.Start), (float)r.CPUUtil)).ToList()) };
-            */
-
+            CPUTrace cpu = new CPUTrace { cpu = cpuRecords.Select(x => ((int)(x.CPUUtil)).ToString()).ToList() };
+            string json = JsonConvert.SerializeObject(cpu, Formatting.Indented);
+            Console.WriteLine($"The serialized model looks like {json}.");
 #if false
-            int steps = cpuRecords.Count() - 1;
-            double totalTime = timeTotal;
-            double stepSize = totalTime / steps;
-
-            List<ValueTrace> vts = new List<ValueTrace>();
-            vts.Add(new ValueTrace(Enumerable.Range(0, int.MaxValue).Take(steps).Zip(cpuRecords, (x, y) => new CPUSample(TraceUtils.ToNanoseconds(x * stepSize), (float)(y.CPUUtil)))));
-
-            CPUUtilTrace trace = new CPUUtilTrace {
-                beginTime = new LongInt(0, 0),
-                //duration = new LongInt(0, totalTime),
-                duration = durationli,
-                counters = vts
-            };
-
-            string json = JsonConvert.SerializeObject(trace, Formatting.Indented);
-
             // var fs = new FileStream(@"C:\users\perf\Sample2.counters", FileMode.Create);
             var fs = new FileStream(outfname, FileMode.Create);
             using (StreamWriter writer = new StreamWriter(fs, Encoding.Unicode)) { // encoding in Unicode here is key
