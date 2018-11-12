@@ -43,13 +43,10 @@ namespace ExternalProfilerDriver
         [Option('s', "sympath", HelpText = "Specify the path(s) to search symbols in")]
         public string SymbolPath { get; set; }
 
-        [Option('i', "interactive", HelpText = "Drop into console once the profiler data is collected and processed")]
-        public bool ConsoleRequested { get; set; }
-
         [Option('d', "dwjsondir", HelpText = "Specify the directory in which to dump resulting dwjson (contents are overwritten)")]
         public string DWJsonOutDir { get; set; }
 
-	[Option('j', "json", HelpText = "Specify whether json output suitable for vscode is to be generated")]
+        [Option('j', "json", HelpText = "Specify whether json output suitable for vscode is to be generated")]
 	public bool JsonOutput { get; set; }
 
         [Value(0)]
@@ -104,19 +101,24 @@ namespace ExternalProfilerDriver
                                     Console.WriteLine($"The path of VTune is: {vtuneExec}");
                                     Environment.Exit(0);
                                 }
-                                
+
+
+#if false // disables syspath   
                                 if (opts.SymbolPath != null) {
                                     Console.WriteLine($"Somehow the thing thinks I have a symbolpath, and it is [{opts.SymbolPath}]");
                                 }
+#endif
                                 
                                 var RestArgs = opts.Rest.ToList();
                                 VTuneCollectHotspotsSpec spec = new VTuneCollectHotspotsSpec() {
                                     WorkloadSpec = String.Join(" ", RestArgs)
                                 };
-                                
+
+#if false
                                 if (opts.SymbolPath != string.Empty) {
                                     spec.SymbolPath = opts.SymbolPath;
                                 }
+#endif
                                 
                                 string vtuneCollectArgs = spec.FullCLI();
 
@@ -128,26 +130,26 @@ namespace ExternalProfilerDriver
 
                                 // If output directory requested and it does not exist, create it
 
-#if false
                                 if (!opts.DryRunRequested) {
-                                    if (opts.DWJsonOutDir == null) {
-                                        Console.WriteLine($"Need an output directory unless in dry run.");
-                                        Environment.Exit(1);
-                                    } else {
-                                        if (!Directory.Exists(opts.DWJsonOutDir)) {
-                                            try {
-                                                Directory.CreateDirectory(opts.DWJsonOutDir);
-                                            } catch (Exception ex) {
-                                                Console.WriteLine($"Couldn't create specified directory [{opts.DWJsonOutDir}]: {ex.Message}");
-                                                Environment.Exit(1);
+                                    if (!opts.JsonOutput) {
+                                        if (opts.DWJsonOutDir == null) {
+                                            Console.WriteLine($"Need an output directory unless in dry run or JSON output requested.");
+                                            Environment.Exit(1);
+                                        } else {
+                                            if (!Directory.Exists(opts.DWJsonOutDir)) {
+                                                try {
+                                                    Directory.CreateDirectory(opts.DWJsonOutDir);
+                                                } catch (Exception ex) {
+                                                    Console.WriteLine($"Couldn't create specified directory [{opts.DWJsonOutDir}]: {ex.Message}");
+                                                    Environment.Exit(1);
+                                                }
                                             }
+                                            dwjsonDir = opts.DWJsonOutDir;
                                         }
-                                        dwjsonDir = opts.DWJsonOutDir;
+                                    } else {
+                                        Console.WriteLine("Supposed to generate JSON");
                                     }
                                 }
-#else
-                                dwjsonDir = @"c:\users\perf\temp";
-#endif
 
                                 if (!opts.DryRunRequested) {
                                     Console.WriteLine($"Collect command line is: [ {vtuneExec} {vtuneCollectArgs} ]");
@@ -171,7 +173,18 @@ namespace ExternalProfilerDriver
                                 Console.WriteLine($"Please check for generated file: [{repspec.ReportOutputFile}]");
                                 Console.WriteLine($"\tand also [{reptimespec.ReportOutputFile}]");
                                 Console.WriteLine($"(Which I should process and dump at directory [{dwjsonDir}]");
-                                */
+*/
+                                if ( opts.JsonOutput) {
+                                    // workload @"C:\users\perf\appdata\local\continuum\anaconda3\python.exe" "c:\users\perf\projects\examples\pybind\test\test.py"
+                                    Console.WriteLine($"Should be generating JSON code from {repspec.ReportOutputFile}.");
+
+#if false
+                                    double runtime = VTuneToDWJSON.CSReportToDWJson(repspec.ReportOutputFile, Path.Combine(dwjsonDir,"Sample.dwjson"));
+                                    VTuneToDWJSON.CPUReportToDWJson(reptimespec.ReportOutputFile, Path.Combine(dwjsonDir, "Session.counters"), runtime);
+                                    #endif
+
+                                    Environment.Exit(0);
+                                } else {
 #if false
                                 double runtime = VTuneToDWJSON.CSReportToDWJson(repspec.ReportOutputFile, Path.Combine(dwjsonDir,"Sample.dwjson"));
                                 VTuneToDWJSON.CPUReportToDWJson(reptimespec.ReportOutputFile, Path.Combine(dwjsonDir, "Session.counters"), runtime);
@@ -186,6 +199,8 @@ namespace ExternalProfilerDriver
                                 }
 #endif
 #endif // this is the general one
+                                }
+
                             })
                             .WithNotParsed(errors => {
                                 Console.WriteLine("Incorrect command line.");
