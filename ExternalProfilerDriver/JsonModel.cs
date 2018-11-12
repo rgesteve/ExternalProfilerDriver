@@ -15,11 +15,6 @@
 // See the Apache Version 2.0 License for specific language governing
 // permissions and limitations under the License.
 
-/* 
-{
-  "cpu": ["84","80","83","82","83","81","83","89","89","85","83","80","90","83","83","87","83","84","84","83","87","87","84","80","83","82","83","81","83","89","89","85","83","80","90","83","83","87","83","84","84","83","87","87","84","80","83","82","83","81","83","89","89","85","83","80","90","83","83","87","83","84","84","83","87","87","84","80","83","82","83","81","83","89","89","85","83","80","90","83","83","87","83","84","84","83","87","87"]
-}
-*/
 /*
 dotnet run -f netcoreapp2.0 -p ExternalProfilerDriver\ExternalProfilerDriver.csproj -- -j -- c:\users\perf\appdata\local\continuum\anaconda3\python.exe c:\users\perf\projects\examples\pybind\test\test.py
  */
@@ -31,6 +26,11 @@ using Newtonsoft.Json;
 
 namespace ExternalProfilerDriver
 {
+    /* 
+    {
+        "cpu": ["84","80","83","82","83","81","83","89","89","85","83","80","90","83","83","87","83","84","84","83","87","87","84","80","83","82","83","81","83","89","89","85","83","80","90","83","83","87","83","84","84","83","87","87","84","80","83","82","83","81","83","89","89","85","83","80","90","83","83","87","83","84","84","83","87","87","84","80","83","82","83","81","83","89","89","85","83","80","90","83","83","87","83","84","84","83","87","87"]
+    }
+    */
     class CPUTrace
     {
         public List<string> cpu;
@@ -46,8 +46,7 @@ namespace ExternalProfilerDriver
     {headerName: "Start Address", field: "start_address"}
 ];
      */
-     /* profile data:
-
+     /* 
      [{"function": "func@0x1e0897c0", "cpu_time": "12.703125", "module": "python36.dll", "function_full": "func@0x1e0897c0", "source_file": "Unknown", "start_address": "Unknown", 
     "children":[
         {"function":"_scrt_common_main_seh", "cpu_time": "12.703125", "module": "python.exe", "function_full": "_scrt_common_main_seh", "source_file": "exe_common.inl", "start_address": "0x1d001150"},
@@ -71,16 +70,6 @@ namespace ExternalProfilerDriver
     ]}]
       */
 
-      /*
-              {"function":"_scrt_common_main_seh", 
-              "cpu_time": "12.703125", 
-              "module": "python.exe", 
-              "function_full": "_scrt_common_main_seh", 
-              "source_file": "exe_common.inl", 
-              "start_address": "0x1d001150"},
-
-       */
-
        /// <summary>
        /// Looks like this is a straightforward version of PerformanceSample
        /// </summary>       
@@ -97,5 +86,10 @@ namespace ExternalProfilerDriver
        class CallTreeSpec : FunctionSummarySpec
        {
            public List<FunctionSummarySpec> children {get; set;}
+       }
+       
+       class CallTreeSpecList
+       {
+           public List<CallTreeSpec> frames {get; set;}
        }
 }

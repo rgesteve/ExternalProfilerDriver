@@ -181,8 +181,8 @@ namespace ExternalProfilerDriver
                                     double runtime = VTuneToJSON.CSReportToJson(repspec.ReportOutputFile, Path.Combine(dwjsonDir,"Sample.dwjson"));
                                     VTuneToJSON.CPUReportToJson(reptimespec.ReportOutputFile, Path.Combine(dwjsonDir, "Session.counters"), runtime);
 #else
-                                    double runtime = VTuneToJSON.CSReportToJson(repspec.ReportOutputFile, "<placeholder>");
-                                    VTuneToJSON.CPUReportToJson(reptimespec.ReportOutputFile, "<placeholder>", runtime);
+        
+                                    VTuneToJSON.ReportToJson(repspec.ReportOutputFile, reptimespec.ReportOutputFile, "<placeholder>");
 #endif
 
                                     Environment.Exit(0);

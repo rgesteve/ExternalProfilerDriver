@@ -32,7 +32,7 @@ namespace ExternalProfilerDriver
         /// <paramref name="filename"/>
         /// </summary>
         /// <param name="filename">The filename with the callstack report</param>
-        public static double CSReportToJson(string filename, string outfname)
+        static CallTreeSpecList CSReportToJson(string filename, string outfname)
         {
 
             if (!File.Exists(filename)) {
@@ -40,12 +40,49 @@ namespace ExternalProfilerDriver
             }
             var samples = VTuneStackParserForCPP.ParseFromFile(filename);
 
-#if true
             Console.WriteLine($"Parsing file: {filename} int output {outfname}.");
+            List<CallTreeSpec> lstframes = new List<CallTreeSpec>();
             foreach(var s in samples) {
-                Console.WriteLine($"sample: {s.TOSFrame.ToString()}");
+                var t = s.TOSFrame;
+                CallTreeSpec top = new CallTreeSpec {
+                    function = t.Function,
+                    cpu_time = t.CPUTime.ToString(),
+                    module = t.Module,
+                    function_full = t.FunctionFull,
+                    source_file = t.SourceFile,
+                    start_address = t.StartAddress
+                };
+
+                List<FunctionSummarySpec> lstInChain = new List<FunctionSummarySpec>();
+                foreach (var tails in s.Stacks) {
+                    foreach(var stack in tails) {
+                        lstInChain.Add(new FunctionSummarySpec {
+                            function = stack.Function,
+                            cpu_time = stack.CPUTime.ToString(),
+                            module = stack.Module,
+                            function_full = stack.FunctionFull,
+                            source_file = stack.SourceFile,
+                            start_address = stack.StartAddress
+                        });
+                    }
+                    // this is where I should be adding lstInChain
+                }
+                if (lstInChain.Count > 0) {
+                    top.children = lstInChain;
+                }
+                //Console.WriteLine($"The first sample has {s.Stacks.Take(1).ToList().Count} stacks.");
+                lstframes.Add(top);
             }
-#else
+
+            CallTreeSpecList test = new CallTreeSpecList { frames = lstframes };
+            return test;
+#if false
+            string json = JsonConvert.SerializeObject(test, Formatting.Indented, new JsonSerializerSettings {
+                    NullValueHandling = NullValueHandling.Ignore});
+            Console.WriteLine($"The serialized model looks like {json}.");
+#endif
+
+#if false
             var trace = new Trace {
                 name = Dns.GetHostName() ?? "machine-name",
                 processor = new ProcessorSpec {
@@ -65,7 +102,7 @@ namespace ExternalProfilerDriver
 #endif
 
             //return total;
-            return 0;
+            //return 0;
         }
 
         public static void CPUReportToJson(string filename, string outfname, double timeTotal = 0.0)
@@ -99,6 +136,17 @@ namespace ExternalProfilerDriver
                 writer.WriteLine(json);
             }
 #endif
+        }
+    
+        public static void ReportToJson(string stacks_filename, string cpu_filename, string outfname) {
+            Console.WriteLine($"Should be parsing stacks from {stacks_filename} and utilization from {cpu_filename}, test.");
+
+            CallTreeSpecList ctree = VTuneToJSON.CSReportToJson(stacks_filename, "<placeholder>");
+            string json = JsonConvert.SerializeObject(ctree, Formatting.Indented, new JsonSerializerSettings {
+                    NullValueHandling = NullValueHandling.Ignore});
+            Console.WriteLine($"The serialized model for callstacks {json}.");
+
+            VTuneToJSON.CPUReportToJson(cpu_filename, "<placeholder>" /* , runtime*/);
         }
     }
 
