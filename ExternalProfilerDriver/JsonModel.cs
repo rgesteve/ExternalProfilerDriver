@@ -36,66 +36,43 @@ namespace ExternalProfilerDriver
         public List<string> cpu;
     }
 
-    /*
-    var columnDefs = [
-    {headerName: "Function", field: 'function', cellRenderer:'agGroupCellRenderer'},
-    {headerName: "CPU Time", field: "cpu_time"},
-    {headerName: "Module", field: "module"},
-    {headerName: "Function (Full)", field: "function_full"},
-    {headerName: "Source File", field: "source_file"},
-    {headerName: "Start Address", field: "start_address"}
-];
-     */
-     /* 
-     [{"function": "func@0x1e0897c0", "cpu_time": "12.703125", "module": "python36.dll", "function_full": "func@0x1e0897c0", "source_file": "Unknown", "start_address": "Unknown", 
-    "children":[
-        {"function":"_scrt_common_main_seh", "cpu_time": "12.703125", "module": "python.exe", "function_full": "_scrt_common_main_seh", "source_file": "exe_common.inl", "start_address": "0x1d001150"},
-        {"function":"BaseThreadInitThunk", "cpu_time": "0", "module": "KERNEL32.DLL", "function_full": "BaseThreadInitThunk", "source_file": "[Unknown]", "start_address": "0x180012760"},
-        {"function":"RtlUserThreadStart", "cpu_time": "0", "module": "ntdll.dll", "function_full": "RtlUserThreadStart", "source_file": "[Unknown]", "start_address": "0x180070d30"}
-    ]},
-    {"function": "jpeg_idct_16x16", "cpu_time": "1.538451", "module": "opencv_imgcodecs331.dll", "function_full": "peg_idct_16x16", "source_file": "[Unknown]", "start_address": "0x180131d90",
-    "children": [
-        {"function": "func@0x180123b90"         ,"cpu_time": "1.538451","module": "opencv_imgcodecs331.dll", "function_full": "func@0x180123b90",  "source_file": "[Unknown]", "start_address": "0x180123b90" },
-        {"function": "func@0x1801233b0"         ,"cpu_time": "0",       "module": "opencv_imgcodecs331.dll", "function_full": "func@0x1801233b0",  "source_file": "[Unknown]", "start_address": "0x1801233b0" },
-        {"function": "jpeg_read_scanlines"      ,"cpu_time": "0",       "module": "opencv_imgcodecs331.dll", "function_full": "jpeg_read_scanlines","source_file": "[Unknown]", "start_address": "0x18011c900"},
-        {"function": "cv::JpegDecoder::readData","cpu_time": "0",       "module": "opencv_imgcodecs331.dll", "function_full": "cv::JpegDecoder::readData(class cv::Mat &)", "source_file": "grfmt_jpeg.cpp", "start_address": "0x1800277a0"},
-        {"function": "cv::imdecode_"            ,"cpu_time": "0",       "module": "opencv_imgcodecs331.dll", "function_full": "cv::imdecode_",      "source_file": "loadsave.cpp", "start_address": "0x18000eb10"}
+    /// <summary>
+    /// Looks like this is a straightforward version of PerformanceSample
+    /// </summary>       
+    class FunctionSummarySpec
+    {
+        public string function { get; set; }
+        public string cpu_time { get; set; }
+        public string module { get; set; }
+        public string function_full {get; set;}
+        public string source_file { get; set; }
+        public string start_address {get; set;}
+    }
 
-    ]},
-    {"function": "jpeg_idct_islow" , "cpu_time": "1.214521", "module": "opencv_imgcodecs331.dll", "function_full": "jpeg_idct_16x16" , "source_file":"jpeg_idct_islow,[Unknown]", "start_address": "0x180135c20",
-    "children": [
-        {"function": "func@0x180123b90", "cpu_time": "1.203510", "module": "opencv_imgcodecs331.dll", "function_full": "func@0x180123b90", "source_file":"[Unknown]", "start_address": "0x180123b90"},
-        {"function": "func@0x1801233b0", "cpu_time": "0"       , "module": "opencv_imgcodecs331.dll", "function_full": "func@0x1801233b0", "source_file":"[Unknown]", "start_address": "0x1801233b0"}
-    
-    ]}]
-      */
-
-       /// <summary>
-       /// Looks like this is a straightforward version of PerformanceSample
-       /// </summary>       
-       class FunctionSummarySpec
-       {
-           public string function { get; set; }
-           public string cpu_time { get; set; }
-           public string module { get; set; }
-           public string function_full {get; set;}
-           public string source_file { get; set; }
-           public string start_address {get; set;}
-       }
-
-       class CallTreeSpec : FunctionSummarySpec
-       {
-           public List<FunctionSummarySpec> children {get; set;}
-       }
+    class CallTreeSpec : FunctionSummarySpec
+    {
+        public List<FunctionSummarySpec> children {get; set;}
+    }
        
-       class CallTreeSpecList
-       {
-           public List<CallTreeSpec> frames {get; set;}
-       }
+    class CallTreeSpecList
+    {
+        public List<CallTreeSpec> frames {get; set;}
+    }
 
-       class RunSummary
-       {
-           public CallTreeSpecList frames { get; set; }
-           public List<string> cpu { get; set; }
-       }
+    class ModuleAttrib {
+        public string module { get; set; }
+        public Single time { get; set; }
+        public Single fraction {get; set; }
+    }
+    class ModuleBreakDown
+    {
+        public List< ModuleAttrib > module_attribution {get; set;}
+    }
+
+    class RunSummary
+    {
+        public CallTreeSpecList frames { get; set; }
+        public List<string> cpu { get; set; }
+        public List< ModuleAttrib > module_attribution {get; set;}
+    }
 }

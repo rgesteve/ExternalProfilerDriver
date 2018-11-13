@@ -34,7 +34,6 @@ namespace ExternalProfilerDriver
         /// <param name="filename">The filename with the callstack report</param>
         static CallTreeSpecList CSReportToJson(string filename)
         {
-
             if (!File.Exists(filename)) {
                 throw new ArgumentException($"Specified file {filename} does not exist!");
             }
@@ -64,12 +63,12 @@ namespace ExternalProfilerDriver
                             start_address = stack.StartAddress
                         });
                     }
-                    // this is where I should be adding lstInChain
+                    // TODO: this is where I should be adding lstInChain
                 }
                 if (lstInChain.Count > 0) {
                     top.children = lstInChain;
                 }
-                //Console.WriteLine($"The first sample has {s.Stacks.Take(1).ToList().Count} stacks.");
+
                 lstframes.Add(top);
             }
 
@@ -77,7 +76,7 @@ namespace ExternalProfilerDriver
             return ret;
         }
 
-        static CPUTrace CPUReportToJson(string filename/*, string outfname, double timeTotal = 0.0 */)
+        static CPUTrace CPUReportToJson(string filename)
         {
 
             if (!File.Exists(filename)) {
@@ -91,33 +90,51 @@ namespace ExternalProfilerDriver
             CPUTrace cpu = new CPUTrace { cpu = cpuRecords.Select(x => ((int)(x.CPUUtil)).ToString()).ToList() };
             return cpu;
         }
+
+        static ModuleBreakDown CalculateComposition(string filename) {
+            if (!File.Exists(filename)) {
+                throw new ArgumentException($"Specified file {filename} does not exist!");
+            }
+            var samples = VTuneStackParserForCPP.ParseFromFile(filename);
+
+            var relevant = samples.Select(x => x.TOSFrame).Select(x => new {Module = x.Module, CPUTime = x.CPUTime});
+
+            var totalTime = relevant.Sum(x => x.CPUTime);
+	
+	        var perModule = relevant.GroupBy(x => x.Module, (key, values) => new { Module = key, Time = values.Sum(x => x.CPUTime)});
+	        var perModuleNormalized = perModule.Select(x => new { Module = x.Module, Time = x.Time, Portion = (x.Time / totalTime) * 100}  );
+
+            foreach(var r in perModuleNormalized) {
+                Console.WriteLine($"Module: {r.Module} contributes {r.Portion} % of a total time of {totalTime}.");
+            }
+
+            ModuleBreakDown mod = new ModuleBreakDown { 
+                module_attribution = perModuleNormalized.Select(
+                    x => new ModuleAttrib {module = x.Module, 
+                                           time = x.Time,
+                                           fraction = x.Portion}).ToList()
+            };
+
+            return mod;
+        }
     
         public static void ReportToJson(string stacks_filename, string cpu_filename, string outfname) {
-            Console.WriteLine($"+++ Should be parsing stacks from {stacks_filename} and utilization from {cpu_filename}, output to {outfname}.");
-
-            CallTreeSpecList ctree = VTuneToJSON.CSReportToJson(stacks_filename);
+            CallTreeSpecList ctree = CSReportToJson(stacks_filename);
             CPUTrace cpu = CPUReportToJson(cpu_filename);
+            ModuleBreakDown modules = CalculateComposition(stacks_filename);
 
             RunSummary summary = new RunSummary {
                 frames = ctree,
-                cpu = cpu.cpu
+                cpu = cpu.cpu,
+                module_attribution = modules.module_attribution
             };
 
             string json = JsonConvert.SerializeObject(summary, Formatting.Indented, new JsonSerializerSettings {
                     NullValueHandling = NullValueHandling.Ignore});
 
-            //var fs = new FileStream(@"C:\users\perf\Sample2.counters", FileMode.Create);
-            //var fs = new FileStream(outfname, FileMode.Create);
-            //using (StreamWriter writer = new StreamWriter(fs, Encoding.Unicode)) { // encoding in Unicode here is key
             using (StreamWriter writer = File.CreateText(outfname)) {
                 writer.WriteLine(json);
             }
-
-#if false
-            StreamWriter writer = File.CreateText(outfname);
-            writer.WriteLine(json);
-            writer.Close();
-#endif
         }
     }
 
