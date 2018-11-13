@@ -131,23 +131,19 @@ namespace ExternalProfilerDriver
                                 // If output directory requested and it does not exist, create it
 
                                 if (!opts.DryRunRequested) {
-                                    if (!opts.JsonOutput) {
-                                        if (opts.DWJsonOutDir == null) {
-                                            Console.WriteLine($"Need an output directory unless in dry run or JSON output requested.");
-                                            Environment.Exit(1);
-                                        } else {
-                                            if (!Directory.Exists(opts.DWJsonOutDir)) {
-                                                try {
-                                                    Directory.CreateDirectory(opts.DWJsonOutDir);
-                                                } catch (Exception ex) {
-                                                    Console.WriteLine($"Couldn't create specified directory [{opts.DWJsonOutDir}]: {ex.Message}");
-                                                    Environment.Exit(1);
-                                                }
-                                            }
-                                            dwjsonDir = opts.DWJsonOutDir;
-                                        }
+                                    if (opts.DWJsonOutDir == null) {
+                                        Console.WriteLine($"Need an output directory unless in dry run or JSON output requested.");
+                                        Environment.Exit(1);
                                     } else {
-                                        Console.WriteLine("Supposed to generate JSON");
+                                        if (!Directory.Exists(opts.DWJsonOutDir)) {
+                                            try {
+                                                Directory.CreateDirectory(opts.DWJsonOutDir);
+                                            } catch (Exception ex) {
+                                                Console.WriteLine($"Couldn't create specified directory [{opts.DWJsonOutDir}]: {ex.Message}");
+                                                Environment.Exit(1);
+                                            }
+                                        }
+                                        dwjsonDir = opts.DWJsonOutDir;
                                     }
                                 }
 
@@ -175,16 +171,12 @@ namespace ExternalProfilerDriver
                                 Console.WriteLine($"(Which I should process and dump at directory [{dwjsonDir}]");
 */
                                 if ( opts.JsonOutput) {
-                                    // this is different from generating DWJSON in that a single JSON object is generated, not two files
-                                    // workload @"C:\users\perf\appdata\local\continuum\anaconda3\python.exe" "c:\users\perf\projects\examples\pybind\test\test.py"
-#if false
-                                    double runtime = VTuneToJSON.CSReportToJson(repspec.ReportOutputFile, Path.Combine(dwjsonDir,"Sample.dwjson"));
-                                    VTuneToJSON.CPUReportToJson(reptimespec.ReportOutputFile, Path.Combine(dwjsonDir, "Session.counters"), runtime);
-#else
-        
-                                    VTuneToJSON.ReportToJson(repspec.ReportOutputFile, reptimespec.ReportOutputFile, "<placeholder>");
-#endif
+                                    /*
+                                    dotnet run -f netcoreapp2.0 -p ExternalProfilerDriver\ExternalProfilerDriver.csproj -- -d c:\temp -j -- c:\users\perf\appdata\local\continuum\anaconda3\python.exe c:\users\perf\projects\examples\pybind\test\test.py
+                                    */
 
+                                    // this is different from generating DWJSON in that a single JSON object is generated, not two files
+                                    VTuneToJSON.ReportToJson(repspec.ReportOutputFile, reptimespec.ReportOutputFile, Path.Combine(dwjsonDir, "output.json"));
                                     Environment.Exit(0);
                                 } else {
 #if false
@@ -200,7 +192,7 @@ namespace ExternalProfilerDriver
                                     Environment.Exit(1);
                                 }
 #endif
-#endif // this is the general one
+#endif
                                 }
 
                             })

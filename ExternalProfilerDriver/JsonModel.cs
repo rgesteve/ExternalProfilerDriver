@@ -92,4 +92,10 @@ namespace ExternalProfilerDriver
        {
            public List<CallTreeSpec> frames {get; set;}
        }
+
+       class RunSummary
+       {
+           public CallTreeSpecList frames { get; set; }
+           public List<string> cpu { get; set; }
+       }
 }
