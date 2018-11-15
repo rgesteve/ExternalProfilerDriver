@@ -115,6 +115,8 @@ namespace ExternalProfilerDriver
                                            fraction = x.Portion}).ToList()
             };
 
+            mod.total_time = totalTime;
+
             return mod;
         }
     
@@ -126,7 +128,8 @@ namespace ExternalProfilerDriver
             RunSummary summary = new RunSummary {
                 frames = ctree,
                 cpu = cpu.cpu,
-                module_attribution = modules.module_attribution
+                module_attribution = modules.module_attribution,
+                total_time = modules.total_time
             };
 
             string json = JsonConvert.SerializeObject(summary, Formatting.Indented, new JsonSerializerSettings {

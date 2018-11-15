@@ -26,11 +26,6 @@ using Newtonsoft.Json;
 
 namespace ExternalProfilerDriver
 {
-    /* 
-    {
-        "cpu": ["84","80","83","82","83","81","83","89","89","85","83","80","90","83","83","87","83","84","84","83","87","87","84","80","83","82","83","81","83","89","89","85","83","80","90","83","83","87","83","84","84","83","87","87","84","80","83","82","83","81","83","89","89","85","83","80","90","83","83","87","83","84","84","83","87","87","84","80","83","82","83","81","83","89","89","85","83","80","90","83","83","87","83","84","84","83","87","87"]
-    }
-    */
     class CPUTrace
     {
         public List<string> cpu;
@@ -66,11 +61,13 @@ namespace ExternalProfilerDriver
     }
     class ModuleBreakDown
     {
+        public Single total_time { get; set; }
         public List< ModuleAttrib > module_attribution {get; set;}
     }
 
     class RunSummary
     {
+        public Single total_time { get; set; }
         public CallTreeSpecList frames { get; set; }
         public List<string> cpu { get; set; }
         public List< ModuleAttrib > module_attribution {get; set;}
