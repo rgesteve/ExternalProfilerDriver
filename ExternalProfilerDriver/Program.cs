@@ -68,25 +68,19 @@ namespace ExternalProfilerDriver
                             .WithParsed<ProgramOptions>(opts => {
 
 // whether we should run from pre-generated report
-#if false
                                 if (opts.CallStackFNameToParse != null) {
                                     try {
                                         // TODO: test /tmp/results_20180314/r_stacks_0004.csv
+					//            /home/rgesteve/test_collection/report_callstack.csv
+					Console.WriteLine($"I should be parsing the provided file: {opts.CallStackFNameToParse}");
                                         ParseStackReport(opts.CallStackFNameToParse, opts.SymbolPath);
                                     } catch (Exception ex) {
                                         Console.WriteLine($"Couldn't parse callstack file with error: {ex.Message}");
                                         Environment.Exit(1);
                                     }
 
-                                    if (opts.ConsoleRequested) {
-                                        Console.WriteLine("Should be opening console");
-                                    } else {
-                                        Console.WriteLine("Should be dumping");
-                                    }
-
                                     Environment.Exit(0);
                                 }
-#endif
 
                                 string vtuneExec = "";
 
@@ -102,6 +96,9 @@ namespace ExternalProfilerDriver
                                     Environment.Exit(0);
                                 }
 
+				/// TODO: Remove this part
+				Console.WriteLine($"--------- Finishing here ------");
+				Environment.Exit(0);
 
 #if false // disables syspath   
                                 if (opts.SymbolPath != null) {
@@ -169,11 +166,12 @@ namespace ExternalProfilerDriver
                                 Console.WriteLine($"Please check for generated file: [{repspec.ReportOutputFile}]");
                                 Console.WriteLine($"\tand also [{reptimespec.ReportOutputFile}]");
                                 Console.WriteLine($"(Which I should process and dump at directory [{dwjsonDir}]");
-*/
+				*/
                                 if ( opts.JsonOutput) {
                                     /*
                                     dotnet run -f netcoreapp2.0 -p ExternalProfilerDriver\ExternalProfilerDriver.csproj -- -d c:\temp -j -- c:\users\perf\appdata\local\continuum\anaconda3\python.exe c:\users\perf\projects\examples\pybind\test\test.py
                                     */
+				    Console.WriteLine($"Going to process filename: {repspec.ReportOutputFile}.");
 
                                     // this is different from generating DWJSON in that a single JSON object is generated, not two files
                                     VTuneToJSON.ReportToJson(repspec.ReportOutputFile, reptimespec.ReportOutputFile, Path.Combine(dwjsonDir, "output.json"));
@@ -223,6 +221,7 @@ namespace ExternalProfilerDriver
 
         private static void ParseStackReport(string fname, string symbolPath = null)
         {
+	    Console.WriteLine($"I should be parsing the provided file: {fname}, with possible symbolpath [{symbolPath}]");
             string possibleFn = fname;
             if (!File.Exists(possibleFn)) {
                 // The [old] argument parsing library chokes on absolute Linux paths (it gets confused apparently by leading '/')
@@ -231,9 +230,20 @@ namespace ExternalProfilerDriver
                     throw new ParseStackException($"Cannot find callstack file {fname}");
                 }
             }
+    	    Console.WriteLine($"Apparently validated that file {possibleFn} exists");
+
             try {
                 // should I not just call VTuneToDWJSON.CSReportToDWJson
-                var samples = VTuneToDWJSON.ParseFromFile(possibleFn);
+            	var samples = VTuneStackParserForCPP.ParseFromFile(possibleFn);
+
+		Console.WriteLine($"I just parsed the file, checking out... ({samples.Count()} samples)");
+
+		foreach (var s in samples) {
+		    //Console.WriteLine($"Found sample {s} (of type {s.GetType()})");
+		    Console.WriteLine($"Found sample with {s.TOSFrame.Function} at the top, time ({s.TOSFrame.CPUTime})");
+		}
+
+		return;
                 
                 var modFunDictionary = samples.SelectMany(sm => sm.AllSamples())
                                               .Select(p => new { Module = p.Module, Function = p.Function, SourceFile = p.SourceFile })

@@ -108,7 +108,6 @@ namespace ExternalProfilerDriver
         /// <param name="filename">The filename with the callstack report</param>
         public static double CSReportToDWJson(string filename, string outfname)
         {
-
             if (!File.Exists(filename)) {
                 throw new ArgumentException($"Specified file {filename} does not exist!");
             }
