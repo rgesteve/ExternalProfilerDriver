@@ -49,6 +49,7 @@
         {
             "label" : "build",
             "windows" : {
+                //"command" : "dotnet build -f netcoreapp2.0 ExternalProfilerDriver\\ExternalProfilerDriver.csproj"
                 "command" : "dotnet build -f netcoreapp2.0 ExternalProfilerDriver\\ExternalProfilerDriver.csproj"
             },
             "type" : "shell",
@@ -68,7 +69,7 @@
         {
             "label" : "publish",
             "windows" : {
-                "command" : "dotnet publish -f netcoreapp2.0 ExternalProfilerDriver\\ExternalProfilerDriver.csproj"
+                "command" : "dotnet publish -f netcoreapp2.0 ExternalProfilerDriver\\ExternalProfilerDriver.csproj -r win10-x64"
             },
             "type" : "shell",
             "group" : {

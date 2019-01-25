@@ -13,7 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ExternalProfilerDriver\ExternalProfilerDriverNetStandard.csproj" />
+    <ProjectReference Include="..\ExternalProfilerDriver\ExternalProfilerDriver.csproj" />
   </ItemGroup>
 
   <ItemGroup>
