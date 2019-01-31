@@ -1,0 +1,120 @@
+Function,Function Stack,CPU Time,Module,Function (Full),Source File,Start Address
+"std::uniform_real<double>::operator()<class std::mersenne_twister_engine<unsigned int,32,624,397,31,2567483615,11,4294967295,7,2636928640,15,4022730752,18,1812433253> >",,11.944004,montecarlopi.cp37-win_amd64.pyd,"std::uniform_real<double>::operator()<class std::mersenne_twister_engine<unsigned int,32,624,397,31,2567483615,11,4294967295,7,2636928640,15,4022730752,18,1812433253> >(class std::mersenne_twister_engine<unsigned int,32,624,397,31,2567483615,11,4294967295,7,2636928640,15,4022730752,18,1812433253> &)",random,0x18001e0f0
+,MonteCarloPi,11.944004,montecarlopi.cp37-win_amd64.pyd,MonteCarloPi(long),montecarlopi.cpp,0x180031920
+,"pybind11::detail::argument_loader<long>::call_impl<double,double (__cdecl*&)(long),0,pybind11::detail::void_type>",0,montecarlopi.cp37-win_amd64.pyd,"pybind11::detail::argument_loader<long>::call_impl<double,double (__cdecl*&)(long),0,pybind11::detail::void_type>",cast.h,0x18002f3e0
+,"pybind11::detail::argument_loader<long>::call<double,pybind11::detail::void_type,double (__cdecl*&)(long)>",0,montecarlopi.cp37-win_amd64.pyd,"pybind11::detail::argument_loader<long>::call<double,pybind11::detail::void_type,double (__cdecl*&)(long)>",cast.h,0x18002d690
+,<lambda_32c8b0b7ac186ec33c2e91f20ba20553>::operator(),0,montecarlopi.cp37-win_amd64.pyd,<lambda_32c8b0b7ac186ec33c2e91f20ba20553>::operator(),pybind11.h,0x18002ae50
+,<lambda_32c8b0b7ac186ec33c2e91f20ba20553>::<lambda_invoker_cdecl>,0,montecarlopi.cp37-win_amd64.pyd,<lambda_32c8b0b7ac186ec33c2e91f20ba20553>::<lambda_invoker_cdecl>,pybind11.h,0x18002af70
+,pybind11::cpp_function::dispatcher,0,montecarlopi.cp37-win_amd64.pyd,"pybind11::cpp_function::dispatcher(struct _object *,struct _object *,struct _object *)",pybind11.h,0x180009010
+,PyMethodDef_RawFastCallKeywords,0,python37.dll,PyMethodDef_RawFastCallKeywords,call.c,0x18002dc10
+,call_function,0,python37.dll,call_function,ceval.c,0x18002e490
+,PyEval_EvalFrameDefault,0,python37.dll,PyEval_EvalFrameDefault,ceval.c,0x18002e970
+,PyEval_EvalCodeWithName,0,python37.dll,PyEval_EvalCodeWithName,ceval.c,0x18001efe0
+,PyEval_EvalCodeEx,0,python37.dll,PyEval_EvalCodeEx,ceval.c,0x1800048c8
+,PyEval_EvalCode,0,python37.dll,PyEval_EvalCode,ceval.c,0x180004894
+,run_mod,0,python37.dll,run_mod,pythonrun.c,0x180004828
+,PyRun_FileExFlags,0,python37.dll,PyRun_FileExFlags,pythonrun.c,0x1801b747c
+,PyRun_SimpleFileExFlags,0,python37.dll,PyRun_SimpleFileExFlags,pythonrun.c,0x1801b7b20
+,PyRun_AnyFileExFlags,0,python37.dll,PyRun_AnyFileExFlags,pythonrun.c,0x1801b73ac
+,pymain_run_file,0,python37.dll,pymain_run_file,main.c,0x1800fd418
+,pymain_run_filename,0,python37.dll,pymain_run_filename,main.c,0x1800fd510
+,func@0x180092747,0,python37.dll,func@0x180092747,[Unknown],0x180092747
+,pymain_main,0,python37.dll,pymain_main,main.c,0x1800315dc
+,Py_Main,0,python37.dll,Py_Main,main.c,0x18003115c
+,_scrt_common_main_seh,0,python.exe,_scrt_common_main_seh,exe_common.inl,0x140001150
+,BaseThreadInitThunk,0,KERNEL32.DLL,BaseThreadInitThunk,[Unknown],0x180008350
+,RtlUserThreadStart,0,ntdll.dll,RtlUserThreadStart,[Unknown],0x18006e830
+,,,,,,
+inUnitCircle,,0.409452,montecarlopi.cp37-win_amd64.pyd,"inUnitCircle(double,double)",montecarlopi.cpp,0x180031a30
+,MonteCarloPi,0.409452,montecarlopi.cp37-win_amd64.pyd,MonteCarloPi(long),montecarlopi.cpp,0x180031920
+,"pybind11::detail::argument_loader<long>::call_impl<double,double (__cdecl*&)(long),0,pybind11::detail::void_type>",0,montecarlopi.cp37-win_amd64.pyd,"pybind11::detail::argument_loader<long>::call_impl<double,double (__cdecl*&)(long),0,pybind11::detail::void_type>",cast.h,0x18002f3e0
+,"pybind11::detail::argument_loader<long>::call<double,pybind11::detail::void_type,double (__cdecl*&)(long)>",0,montecarlopi.cp37-win_amd64.pyd,"pybind11::detail::argument_loader<long>::call<double,pybind11::detail::void_type,double (__cdecl*&)(long)>",cast.h,0x18002d690
+,<lambda_32c8b0b7ac186ec33c2e91f20ba20553>::operator(),0,montecarlopi.cp37-win_amd64.pyd,<lambda_32c8b0b7ac186ec33c2e91f20ba20553>::operator(),pybind11.h,0x18002ae50
+,<lambda_32c8b0b7ac186ec33c2e91f20ba20553>::<lambda_invoker_cdecl>,0,montecarlopi.cp37-win_amd64.pyd,<lambda_32c8b0b7ac186ec33c2e91f20ba20553>::<lambda_invoker_cdecl>,pybind11.h,0x18002af70
+,pybind11::cpp_function::dispatcher,0,montecarlopi.cp37-win_amd64.pyd,"pybind11::cpp_function::dispatcher(struct _object *,struct _object *,struct _object *)",pybind11.h,0x180009010
+,PyMethodDef_RawFastCallKeywords,0,python37.dll,PyMethodDef_RawFastCallKeywords,call.c,0x18002dc10
+,call_function,0,python37.dll,call_function,ceval.c,0x18002e490
+,PyEval_EvalFrameDefault,0,python37.dll,PyEval_EvalFrameDefault,ceval.c,0x18002e970
+,PyEval_EvalCodeWithName,0,python37.dll,PyEval_EvalCodeWithName,ceval.c,0x18001efe0
+,PyEval_EvalCodeEx,0,python37.dll,PyEval_EvalCodeEx,ceval.c,0x1800048c8
+,PyEval_EvalCode,0,python37.dll,PyEval_EvalCode,ceval.c,0x180004894
+,run_mod,0,python37.dll,run_mod,pythonrun.c,0x180004828
+,PyRun_FileExFlags,0,python37.dll,PyRun_FileExFlags,pythonrun.c,0x1801b747c
+,PyRun_SimpleFileExFlags,0,python37.dll,PyRun_SimpleFileExFlags,pythonrun.c,0x1801b7b20
+,PyRun_AnyFileExFlags,0,python37.dll,PyRun_AnyFileExFlags,pythonrun.c,0x1801b73ac
+,pymain_run_file,0,python37.dll,pymain_run_file,main.c,0x1800fd418
+,pymain_run_filename,0,python37.dll,pymain_run_filename,main.c,0x1800fd510
+,func@0x180092747,0,python37.dll,func@0x180092747,[Unknown],0x180092747
+,pymain_main,0,python37.dll,pymain_main,main.c,0x1800315dc
+,Py_Main,0,python37.dll,Py_Main,main.c,0x18003115c
+,_scrt_common_main_seh,0,python.exe,_scrt_common_main_seh,exe_common.inl,0x140001150
+,BaseThreadInitThunk,0,KERNEL32.DLL,BaseThreadInitThunk,[Unknown],0x180008350
+,RtlUserThreadStart,0,ntdll.dll,RtlUserThreadStart,[Unknown],0x18006e830
+,,,,,,
+MonteCarloPi,,0.263645,montecarlopi.cp37-win_amd64.pyd,MonteCarloPi(long),montecarlopi.cpp,0x180031920
+,"pybind11::detail::argument_loader<long>::call_impl<double,double (__cdecl*&)(long),0,pybind11::detail::void_type>",0.263645,montecarlopi.cp37-win_amd64.pyd,"pybind11::detail::argument_loader<long>::call_impl<double,double (__cdecl*&)(long),0,pybind11::detail::void_type>",cast.h,0x18002f3e0
+,"pybind11::detail::argument_loader<long>::call<double,pybind11::detail::void_type,double (__cdecl*&)(long)>",0,montecarlopi.cp37-win_amd64.pyd,"pybind11::detail::argument_loader<long>::call<double,pybind11::detail::void_type,double (__cdecl*&)(long)>",cast.h,0x18002d690
+,<lambda_32c8b0b7ac186ec33c2e91f20ba20553>::operator(),0,montecarlopi.cp37-win_amd64.pyd,<lambda_32c8b0b7ac186ec33c2e91f20ba20553>::operator(),pybind11.h,0x18002ae50
+,<lambda_32c8b0b7ac186ec33c2e91f20ba20553>::<lambda_invoker_cdecl>,0,montecarlopi.cp37-win_amd64.pyd,<lambda_32c8b0b7ac186ec33c2e91f20ba20553>::<lambda_invoker_cdecl>,pybind11.h,0x18002af70
+,pybind11::cpp_function::dispatcher,0,montecarlopi.cp37-win_amd64.pyd,"pybind11::cpp_function::dispatcher(struct _object *,struct _object *,struct _object *)",pybind11.h,0x180009010
+,PyMethodDef_RawFastCallKeywords,0,python37.dll,PyMethodDef_RawFastCallKeywords,call.c,0x18002dc10
+,call_function,0,python37.dll,call_function,ceval.c,0x18002e490
+,PyEval_EvalFrameDefault,0,python37.dll,PyEval_EvalFrameDefault,ceval.c,0x18002e970
+,PyEval_EvalCodeWithName,0,python37.dll,PyEval_EvalCodeWithName,ceval.c,0x18001efe0
+,PyEval_EvalCodeEx,0,python37.dll,PyEval_EvalCodeEx,ceval.c,0x1800048c8
+,PyEval_EvalCode,0,python37.dll,PyEval_EvalCode,ceval.c,0x180004894
+,run_mod,0,python37.dll,run_mod,pythonrun.c,0x180004828
+,PyRun_FileExFlags,0,python37.dll,PyRun_FileExFlags,pythonrun.c,0x1801b747c
+,PyRun_SimpleFileExFlags,0,python37.dll,PyRun_SimpleFileExFlags,pythonrun.c,0x1801b7b20
+,PyRun_AnyFileExFlags,0,python37.dll,PyRun_AnyFileExFlags,pythonrun.c,0x1801b73ac
+,pymain_run_file,0,python37.dll,pymain_run_file,main.c,0x1800fd418
+,pymain_run_filename,0,python37.dll,pymain_run_filename,main.c,0x1800fd510
+,func@0x180092747,0,python37.dll,func@0x180092747,[Unknown],0x180092747
+,pymain_main,0,python37.dll,pymain_main,main.c,0x1800315dc
+,Py_Main,0,python37.dll,Py_Main,main.c,0x18003115c
+,_scrt_common_main_seh,0,python.exe,_scrt_common_main_seh,exe_common.inl,0x140001150
+,BaseThreadInitThunk,0,KERNEL32.DLL,BaseThreadInitThunk,[Unknown],0x180008350
+,RtlUserThreadStart,0,ntdll.dll,RtlUserThreadStart,[Unknown],0x18006e830
+,,,,,,
+LoadLibraryExW,,0.047355,KERNEL32.DLL,LoadLibraryExW,[Unknown],0x180019c00
+,PyImport_FindSharedFuncptrWindows,0.047355,python37.dll,PyImport_FindSharedFuncptrWindows,dynload_win.c,0x180046aa4
+,PyImport_LoadDynamicModuleWithSpec,0,python37.dll,PyImport_LoadDynamicModuleWithSpec,importdl.c,0x1800465b8
+,imp_create_dynamic_impl,0,python37.dll,imp_create_dynamic_impl,import.c,0x1800464f4
+,imp_create_dynamic,0,python37.dll,imp_create_dynamic,import.c.h,0x180046490
+,PyMethodDef_RawFastCallDict,0,python37.dll,PyMethodDef_RawFastCallDict,call.c,0x1800262f0
+,do_call_core,0,python37.dll,do_call_core,ceval.c,0x180010480
+,PyEval_EvalFrameDefault,0,python37.dll,PyEval_EvalFrameDefault,ceval.c,0x18002e970
+,PyEval_EvalCodeWithName,0,python37.dll,PyEval_EvalCodeWithName,ceval.c,0x18001efe0
+,call_function,0,python37.dll,call_function,ceval.c,0x18002e490
+,PyEval_EvalFrameDefault,0,python37.dll,PyEval_EvalFrameDefault,ceval.c,0x18002e970
+,call_function,0,python37.dll,call_function,ceval.c,0x18002e490
+,PyEval_EvalFrameDefault,0,python37.dll,PyEval_EvalFrameDefault,ceval.c,0x18002e970
+,call_function,0,python37.dll,call_function,ceval.c,0x18002e490
+,PyEval_EvalFrameDefault,0,python37.dll,PyEval_EvalFrameDefault,ceval.c,0x18002e970
+,call_function,0,python37.dll,call_function,ceval.c,0x18002e490
+,PyEval_EvalFrameDefault,0,python37.dll,PyEval_EvalFrameDefault,ceval.c,0x18002e970
+,call_function,0,python37.dll,call_function,ceval.c,0x18002e490
+,PyEval_EvalFrameDefault,0,python37.dll,PyEval_EvalFrameDefault,ceval.c,0x18002e970
+,PyFunction_FastCallDict,0,python37.dll,PyFunction_FastCallDict,call.c,0x18001ec50
+,object_vacall,0,python37.dll,object_vacall,call.c,0x18001ddc0
+,PyObject_CallMethodIdObjArgs,0,python37.dll,PyObject_CallMethodIdObjArgs,call.c,0x18001dd5c
+,import_find_and_load,0,python37.dll,import_find_and_load,import.c,0x180055844
+,PyImport_ImportModuleLevelObject,0,python37.dll,PyImport_ImportModuleLevelObject,import.c,0x18001d424
+,import_name,0,python37.dll,import_name,ceval.c,0x180016dec
+,PyEval_EvalFrameDefault,0,python37.dll,PyEval_EvalFrameDefault,ceval.c,0x18002e970
+,PyEval_EvalCodeWithName,0,python37.dll,PyEval_EvalCodeWithName,ceval.c,0x18001efe0
+,PyEval_EvalCodeEx,0,python37.dll,PyEval_EvalCodeEx,ceval.c,0x1800048c8
+,PyEval_EvalCode,0,python37.dll,PyEval_EvalCode,ceval.c,0x180004894
+,run_mod,0,python37.dll,run_mod,pythonrun.c,0x180004828
+,PyRun_FileExFlags,0,python37.dll,PyRun_FileExFlags,pythonrun.c,0x1801b747c
+,PyRun_SimpleFileExFlags,0,python37.dll,PyRun_SimpleFileExFlags,pythonrun.c,0x1801b7b20
+,PyRun_AnyFileExFlags,0,python37.dll,PyRun_AnyFileExFlags,pythonrun.c,0x1801b73ac
+,pymain_run_file,0,python37.dll,pymain_run_file,main.c,0x1800fd418
+,pymain_run_filename,0,python37.dll,pymain_run_filename,main.c,0x1800fd510
+,func@0x180092747,0,python37.dll,func@0x180092747,[Unknown],0x180092747
+,pymain_main,0,python37.dll,pymain_main,main.c,0x1800315dc
+,Py_Main,0,python37.dll,Py_Main,main.c,0x18003115c
+,_scrt_common_main_seh,0,python.exe,_scrt_common_main_seh,exe_common.inl,0x140001150
+,BaseThreadInitThunk,0,KERNEL32.DLL,BaseThreadInitThunk,[Unknown],0x180008350
+,RtlUserThreadStart,0,ntdll.dll,RtlUserThreadStart,[Unknown],0x18006e830
+,,,,,,
