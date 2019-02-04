@@ -15,12 +15,13 @@ namespace ExternalProfilerDriverTest
     public class VTuneStackParser_Test
     {
         [TestMethod]
-        [DeploymentItem("r_stacks_0004.csv")]
+        //[DeploymentItem("r_stacks_0004.csv")]
+        [DeploymentItem("zlib_example.csv")]
         public void TestParseFromFile()
         {
-            string filename = "r_stacks_0004.csv";
+            string filename = "zlib_example.csv";
             Assert.IsTrue(File.Exists(filename));
-            int expected_sample_count = 4;
+            int expected_sample_count = 5;
             var samples = VTuneStackParser.ParseFromFile(filename).ToList();
             Assert.AreEqual(samples.Count, expected_sample_count);
         } 

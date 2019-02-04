@@ -445,7 +445,7 @@ namespace ExternalProfilerDriver
             trace.counters = new List<ValueTrace> { new ValueTrace(cpuRecords.Select(r => new CPUSample(new LongInt(0, (long)r.Start), (float)r.CPUUtil)).ToList()) };
             */
 
-#if false
+#if true
             int steps = cpuRecords.Count() - 1;
             double totalTime = timeTotal;
             double stepSize = totalTime / steps;
