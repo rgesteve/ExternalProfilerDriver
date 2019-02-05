@@ -94,15 +94,6 @@ namespace ExternalProfilerDriverTest
                 Trace.WriteLine($"**** Got module {r.name}, assigned id: [{r.id}]");
             }
         }
-
-        [TestMethod]
-        [DeploymentItem("mock-funcsline.csv")]
-        public void VerifyFuncLines()
-        {
-            string filename = "mock-funcsline.csv";
-            Assert.IsTrue(File.Exists(filename));
-           
-        }
     }
     
 
