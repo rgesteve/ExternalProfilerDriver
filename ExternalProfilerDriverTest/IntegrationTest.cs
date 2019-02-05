@@ -17,7 +17,11 @@ namespace ExternalProfilerDriverTest
         {
             string vtuneExec = VTuneInvoker.VTunePath();
             Assert.IsTrue(File.Exists(vtuneExec));
-           
+            
+            Process VtuneProcess = Process.Start(vtuneExec, "-version");
+            VtuneProcess.WaitForExit();
+            Assert.AreEqual(VtuneProcess.ExitCode, 0);
+
             VTuneCollectHotspotsSpec spec = new VTuneCollectHotspotsSpec() {
                                             WorkloadSpec = String.Join(" ", "C:\\Users\\clairiky\\Work\\delete\\main.exe") };
             string vtuneCollectArgs = spec.FullCLI();
