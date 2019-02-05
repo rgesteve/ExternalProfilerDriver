@@ -28,6 +28,10 @@
     <None Update="objdump_output.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    
+    <None Update="r_stacks_0004.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

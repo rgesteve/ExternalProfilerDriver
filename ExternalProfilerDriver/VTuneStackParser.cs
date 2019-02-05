@@ -91,7 +91,7 @@ namespace ExternalProfilerDriver
 
     }
 
-    static class VTuneStackParser
+    public static class VTuneStackParser
     {
         public static string RemovePrePosComma(string str)
         {

@@ -24,7 +24,7 @@ using System.Collections.Generic;
 namespace ExternalProfilerDriver
 {
 
-    class ProcessAsyncRunner
+    public class ProcessAsyncRunner
     {
 
         public static Task<Process> Run(string execfname,
@@ -121,7 +121,7 @@ namespace ExternalProfilerDriver
         }
     }
 
-    class ProcessProgressDataload
+    public class ProcessProgressDataload
     {
         public string Message { get; set; }
     }
