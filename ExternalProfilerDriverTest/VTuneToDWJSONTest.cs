@@ -70,13 +70,35 @@ namespace ExternalProfilerDriverTest
             var dict = VTuneToDWJSON.ModuleFuncDictFromSamples(samples);
             Assert.IsTrue(dict.ContainsKey(known_module));
 
-
+            foreach (var m in dict)
+            {
+            	Dictionary< string, FuncInfo > v = m.Value;
+                Trace.WriteLine($"Main Key: {m.Key}");
+                foreach (var vkk in v)
+                {
+                    Trace.WriteLine($"Key: {vkk.Key}, Value: [{vkk.Value.FunctionName}, {vkk.Value.SourceFile}, {vkk.Value.LineNumber}]");
+                }
+            }
+            // Works but this isnt used anywhere?
             Assert.ThrowsException<ArgumentException>(() => VTuneToDWJSON.AddLineNumbers(ref dict, "/etc/test"));
-            //int initial_count = dict.Count;
-            //VTuneToDWJSON.AddLineNumbers(ref dict, "/home/rgesteve/projects/zlib-1.2.11/build");
-            //Assert.AreEqual(initial_count, dict.Count);
+            int initial_count = dict.Count;
+            VTuneToDWJSON.AddLineNumbers(ref dict, "C:\\Users\\clairiky\\Documents\\zlib-1.2.11");
+            Assert.AreEqual(initial_count, dict.Count);
 
-            //var mfiles = VTuneToDWJSON.SourceFilesByModule(dict);
+
+            foreach (var m in dict)
+            {
+            	Dictionary< string, FuncInfo > v = m.Value;
+                Trace.WriteLine($"Main Key: {m.Key}");
+                foreach (var vkk in v)
+                {
+                    Trace.WriteLine($"Key: {vkk.Key}, Value: [{vkk.Value.FunctionName}, {vkk.Value.SourceFile}, {vkk.Value.LineNumber}]");
+                }
+            }
+
+            var mfiles = VTuneToDWJSON.SourceFilesByModule(dict); // Cant test this right now. 
+
+            //TTrace.WriteLine($"**** Got module {r.name}, assigned id: [{r.id}]");
             //int expected_source_files = 3; // this assumes that files are installed in the machine where the tests are run, should mock it instead
             //Assert.AreEqual(expected_source_files, mfiles[known_module].Count);
             
