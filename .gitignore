@@ -265,3 +265,7 @@ __pycache__/
 
 # Backup files
 *.bak*
+
+# Profiler-generated files
+output.json
+
