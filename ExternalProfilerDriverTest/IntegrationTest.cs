@@ -3,7 +3,6 @@ using System.IO;
 using System.Linq;
 using System.Collections.Generic;
 using System.Diagnostics;
-
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using ExternalProfilerDriver;
@@ -17,9 +16,12 @@ namespace ExternalProfilerDriverTest
         public void TestOverall()
         {
             string vtuneExec = VTuneInvoker.VTunePath();
-            string known_vtune_location = "C:\\Program Files (x86)\\IntelSWTools\\VTune Amplifier 2018";
-            StringAssert.StartsWith( vtuneExec, known_vtune_location );
-           
+            Assert.IsTrue(File.Exists(vtuneExec));
+            
+            Process VtuneProcess = Process.Start(vtuneExec, "-version");
+            VtuneProcess.WaitForExit();
+            Assert.AreEqual(VtuneProcess.ExitCode, 0);
+
             VTuneCollectHotspotsSpec spec = new VTuneCollectHotspotsSpec() {
                                             WorkloadSpec = String.Join(" ", "C:\\Users\\clairiky\\Work\\delete\\main.exe") };
             string vtuneCollectArgs = spec.FullCLI();
@@ -51,6 +53,7 @@ namespace ExternalProfilerDriverTest
             Assert.IsTrue(File.Exists(dwjsonPath));
             Assert.IsTrue(File.Exists(counterPath));
             Assert.IsTrue(File.Exists(jsonPath));
+            
         }
     }
 }
